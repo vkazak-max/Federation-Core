@@ -1,0 +1,9 @@
+[package]
+name = "federation-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["vkazak"]
+description = "Core engine for Federation: AI-driven cognitive networking"
+
+[dependencies]
+# Здесь в будущем будут библиотеки для ИИ и Блокчейна
