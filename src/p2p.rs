@@ -1,9 +1,8 @@
-cat > src/p2p.rs << 'EOF'
 use crate::network::{
     deserialize_packet, serialize_packet, FederationMessage, FederationPacket,
     HandshakeAckPayload, PacketBuilder,
 };
-use crate::tensor::{SsauTensor, TrustRegistry};
+use crate::tensor::{LatencyDistribution, SsauTensor, TrustRegistry};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -54,27 +53,43 @@ impl PeerConnection {
     pub async fn send_packet(&mut self, packet: &FederationPacket) -> Result<(), String> {
         let data = serialize_packet(packet).map_err(|e| e.to_string())?;
         let len = data.len() as u32;
+
         if len as usize > MAX_PACKET_SIZE {
             return Err(format!("Packet too large: {}", len));
         }
+
         let mut stream = self.stream.lock().await;
-        stream.write_all(&len.to_be_bytes()).await.map_err(|e| e.to_string())?;
+        stream
+            .write_all(&len.to_be_bytes())
+            .await
+            .map_err(|e| e.to_string())?;
         stream.write_all(&data).await.map_err(|e| e.to_string())?;
         stream.flush().await.map_err(|e| e.to_string())?;
+
         self.packets_tx += 1;
         Ok(())
     }
 
     pub async fn recv_packet(&mut self) -> Result<FederationPacket, String> {
         let mut stream = self.stream.lock().await;
+
         let mut len_buf = [0u8; 4];
-        stream.read_exact(&mut len_buf).await.map_err(|e| format!("Read len error: {}", e))?;
+        stream
+            .read_exact(&mut len_buf)
+            .await
+            .map_err(|e| format!("Read len error: {}", e))?;
+
         let len = u32::from_be_bytes(len_buf) as usize;
         if len > MAX_PACKET_SIZE {
             return Err(format!("Packet too large: {}", len));
         }
+
         let mut buf = vec![0u8; len];
-        stream.read_exact(&mut buf).await.map_err(|e| format!("Read payload error: {}", e))?;
+        stream
+            .read_exact(&mut buf)
+            .await
+            .map_err(|e| format!("Read payload error: {}", e))?;
+
         let packet = deserialize_packet(&buf).map_err(|e| e.to_string())?;
         self.packets_rx += 1;
         Ok(packet)
@@ -109,7 +124,10 @@ impl NodeConfig {
 
 pub struct FederationNode {
     pub config: NodeConfig,
-    pub connections: Arc<RwLock<HashMap<String, PeerConnection>>>,
+
+    /// Важно: храним Arc<Mutex<PeerConnection>> чтобы НЕ держать RWLock во время IO-await
+    pub connections: Arc<RwLock<HashMap<String, Arc<Mutex<PeerConnection>>>>>,
+
     pub ssau_table: Arc<RwLock<HashMap<String, SsauTensor>>>,
     pub trust_registry: Arc<RwLock<TrustRegistry>>,
     pub packets_processed: Arc<Mutex<u64>>,
@@ -132,48 +150,74 @@ impl FederationNode {
         let listener = TcpListener::bind(&self.config.listen_addr)
             .await
             .map_err(|e| format!("Failed to bind {}: {}", self.config.listen_addr, e))?;
-        log::info!("🌐 Node [{}] listening on {}", self.config.node_id, self.config.listen_addr);
+
+        log::info!(
+            "🌐 Node [{}] listening on {}",
+            self.config.node_id,
+            self.config.listen_addr
+        );
+
         loop {
             match listener.accept().await {
                 Ok((stream, peer_addr)) => {
                     log::info!("📡 Incoming connection from {}", peer_addr);
+
                     let node_clone = Arc::clone(&self);
                     tokio::spawn(async move {
                         if let Err(e) = node_clone.handle_incoming(stream, peer_addr).await {
-                            log::error!("❌ Connection error {}: {}", peer_addr, e);
+                            log::error!("❌ Incoming connection error {}: {}", peer_addr, e);
                         }
                     });
                 }
-                Err(e) => { log::error!("❌ Accept error: {}", e); }
+                Err(e) => {
+                    log::error!("❌ Accept error: {}", e);
+                }
             }
         }
     }
 
     async fn handle_incoming(self: Arc<Self>, stream: TcpStream, peer_addr: SocketAddr) -> Result<(), String> {
         let peer_addr_str = peer_addr.to_string();
-        let mut conn = PeerConnection::new(format!("unknown_{}", peer_addr_str), peer_addr, stream);
+
+        // Временный peer_id до handshake
+        let mut conn = PeerConnection::new(
+            format!("unknown_{}", peer_addr_str),
+            peer_addr,
+            stream,
+        );
+
+        // Первый пакет — обязательно Handshake
         let packet = tokio::time::timeout(
             Duration::from_secs(HANDSHAKE_TIMEOUT_SECS),
             conn.recv_packet(),
-        ).await.map_err(|_| "Handshake timeout".to_string())??;
+        )
+        .await
+        .map_err(|_| "Handshake timeout".to_string())??;
 
         match packet.message {
             FederationMessage::Handshake(ref h) => {
                 log::info!("🤝 Handshake from [{}] ({})", h.node_id, peer_addr);
+
                 if h.protocol_version != crate::network::PROTOCOL_VERSION {
                     let reject = PacketBuilder::new(&self.config.node_id)
                         .to(&h.node_id)
                         .build(FederationMessage::HandshakeAck(HandshakeAckPayload {
                             node_id: self.config.node_id.clone(),
                             accepted: false,
-                            rejection_reason: Some(format!("Incompatible protocol: {}", h.protocol_version)),
+                            rejection_reason: Some(format!(
+                                "Incompatible protocol: {}",
+                                h.protocol_version
+                            )),
                             assigned_session_id: String::new(),
                             your_public_ip: peer_addr_str.clone(),
                         }));
+
                     conn.send_packet(&reject).await?;
                     return Err("Incompatible protocol".to_string());
                 }
+
                 let session_id = uuid::Uuid::new_v4().to_string();
+
                 let ack = PacketBuilder::new(&self.config.node_id)
                     .to(&h.node_id)
                     .build(FederationMessage::HandshakeAck(HandshakeAckPayload {
@@ -183,13 +227,25 @@ impl FederationNode {
                         assigned_session_id: session_id,
                         your_public_ip: peer_addr_str,
                     }));
+
                 conn.send_packet(&ack).await?;
+
                 conn.peer_id = h.node_id.clone();
                 conn.state = ConnectionState::Active;
-                log::info!("✅ Handshake complete! Peer [{}] active.", conn.peer_id);
+
                 let peer_id = conn.peer_id.clone();
-                self.connections.write().await.insert(peer_id.clone(), conn);
-                self.peer_message_loop(peer_id).await;
+                log::info!("✅ Handshake complete! Peer [{}] active.", peer_id);
+
+                // Вставляем в таблицу соединений как Arc<Mutex<...>>
+                let conn_arc = Arc::new(Mutex::new(conn));
+                self.connections.write().await.insert(peer_id.clone(), conn_arc);
+
+                // Запускаем loop в отдельной таске
+                let node = Arc::clone(&self);
+                tokio::spawn(async move {
+                    node.peer_message_loop(peer_id).await;
+                });
+
                 Ok(())
             }
             _ => Err("First packet must be Handshake".to_string()),
@@ -198,42 +254,66 @@ impl FederationNode {
 
     pub async fn connect_to_peer(self: Arc<Self>, peer_addr: &str) -> Result<String, String> {
         log::info!("[{}] 🔌 Connecting to {}...", self.config.node_id, peer_addr);
+
         let stream = tokio::time::timeout(
             Duration::from_secs(HANDSHAKE_TIMEOUT_SECS),
             TcpStream::connect(peer_addr),
-        ).await.map_err(|_| format!("Connection timeout: {}", peer_addr))?
-         .map_err(|e| format!("TCP error: {}", e))?;
+        )
+        .await
+        .map_err(|_| format!("Connection timeout: {}", peer_addr))?
+        .map_err(|e| format!("TCP error: {}", e))?;
 
         let addr: SocketAddr = stream.peer_addr().unwrap();
         let mut conn = PeerConnection::new(format!("pending_{}", peer_addr), addr, stream);
 
+        // Новый network.rs: handshake без recipient_id (None) и без their_node_id
+        let known = self.connections.read().await.len() as u32;
         let handshake = crate::network::create_handshake_packet(
-            &self.config.node_id, "unknown",
+            &self.config.node_id,
             &self.config.public_key,
-            self.connections.read().await.len() as u32,
+            known,
         );
+
         conn.send_packet(&handshake).await?;
         log::info!("[{}] 📤 Handshake sent", self.config.node_id);
 
         let ack_packet = tokio::time::timeout(
             Duration::from_secs(HANDSHAKE_TIMEOUT_SECS),
             conn.recv_packet(),
-        ).await.map_err(|_| "HandshakeAck timeout".to_string())??;
+        )
+        .await
+        .map_err(|_| "HandshakeAck timeout".to_string())??;
 
         match ack_packet.message {
             FederationMessage::HandshakeAck(ref ack) => {
                 if !ack.accepted {
-                    return Err(format!("Handshake rejected: {}",
-                        ack.rejection_reason.as_deref().unwrap_or("no reason")));
+                    return Err(format!(
+                        "Handshake rejected: {}",
+                        ack.rejection_reason.as_deref().unwrap_or("no reason")
+                    ));
                 }
+
                 let peer_id = ack.node_id.clone();
-                log::info!("[{}] ✅ Connected to [{}]! Session: {}", self.config.node_id, peer_id, ack.assigned_session_id);
+                log::info!(
+                    "[{}] ✅ Connected to [{}]! Session: {}",
+                    self.config.node_id,
+                    peer_id,
+                    ack.assigned_session_id
+                );
+
                 conn.peer_id = peer_id.clone();
                 conn.state = ConnectionState::Active;
-                self.connections.write().await.insert(peer_id.clone(), conn);
+
+                let conn_arc = Arc::new(Mutex::new(conn));
+                self.connections.write().await.insert(peer_id.clone(), conn_arc);
+
+                // loop
                 let node = Arc::clone(&self);
                 let pid = peer_id.clone();
-                tokio::spawn(async move { node.peer_message_loop(pid).await; });
+                tokio::spawn(async move {
+                    node.peer_message_loop(pid).await;
+                });
+
                 Ok(peer_id)
             }
             _ => Err("Expected HandshakeAck".to_string()),
@@ -241,44 +321,80 @@ impl FederationNode {
     }
 
     async fn peer_message_loop(self: Arc<Self>, peer_id: String) {
-        log::info!("[{}] 🔄 Message loop started for [{}]", self.config.node_id, peer_id);
+        log::info!(
+            "[{}] 🔄 Message loop started for [{}]",
+            self.config.node_id,
+            peer_id
+        );
+
         loop {
-            let packet = {
-                let mut conns = self.connections.write().await;
-                match conns.get_mut(&peer_id) {
-                    Some(conn) => conn.recv_packet().await,
-                    None => break,
-                }
+            // Берём Arc на соединение (без удержания lock во время IO)
+            let conn_arc = {
+                let conns = self.connections.read().await;
+                conns.get(&peer_id).cloned()
             };
+
+            let conn_arc = match conn_arc {
+                Some(c) => c,
+                None => break,
+            };
+
+            // IO под Mutex конкретного соединения
+            let packet = {
+                let mut conn = conn_arc.lock().await;
+                conn.recv_packet().await
+            };
+
             match packet {
                 Ok(p) => {
                     *self.packets_processed.lock().await += 1;
                     self.dispatch_message(p).await;
                 }
                 Err(e) => {
-                    log::warn!("[{}] ⚠️ Peer [{}] disconnected: {}", self.config.node_id, peer_id, e);
+                    log::warn!(
+                        "[{}] ⚠️ Peer [{}] disconnected: {}",
+                        self.config.node_id,
+                        peer_id,
+                        e
+                    );
                     self.trust_registry.write().await.penalize_unreachable(&peer_id);
                     self.connections.write().await.remove(&peer_id);
                     break;
                 }
             }
         }
-        log::info!("[{}] Message loop for [{}] ended", self.config.node_id, peer_id);
+
+        log::info!(
+            "[{}] Message loop for [{}] ended",
+            self.config.node_id,
+            peer_id
+        );
     }
 
     async fn dispatch_message(self: Arc<Self>, packet: FederationPacket) {
         match &packet.message {
             FederationMessage::Heartbeat(hb) => {
-                log::info!("💓 Heartbeat from [{}] uptime={}s load={:.2}",
-                    hb.node_id, hb.uptime_seconds, hb.load_factor);
+                log::info!(
+                    "💓 Heartbeat from [{}] uptime={}s load={:.2}",
+                    hb.node_id,
+                    hb.uptime_seconds,
+                    hb.load_factor
+                );
             }
+
             FederationMessage::SsauUpdate(update) => {
-                log::info!("📊 SSAU Update from [{}]: {} tensors",
-                    update.reporter_node_id, update.tensors.len());
+                log::info!(
+                    "📊 SSAU Update from [{}]: {} tensors",
+                    update.reporter_node_id,
+                    update.tensors.len()
+                );
+
+                let now = chrono::Utc::now().timestamp_millis();
+
                 let mut table = self.ssau_table.write().await;
                 for t_msg in &update.tensors {
                     let key = format!("{}→{}", t_msg.from_node, t_msg.to_node);
-                    use crate::tensor::LatencyDistribution;
+
                     let tensor = SsauTensor {
                         from_node: t_msg.from_node.clone(),
                         to_node: t_msg.to_node.clone(),
@@ -291,40 +407,59 @@ impl FederationNode {
                         bandwidth: t_msg.bandwidth_mbps,
                         reliability: t_msg.reliability,
                         energy_cost: t_msg.energy_cost,
-                        updated_at: 0,
+                        updated_at: now,
                         version: t_msg.version,
                     };
+
                     table.insert(key, tensor);
                 }
             }
+
             FederationMessage::Goodbye { node_id, reason } => {
                 log::info!("👋 Node [{}] leaving: {}", node_id, reason);
                 self.connections.write().await.remove(node_id);
             }
-            _ => {}
+
+            _ => {
+                // MVP: можно логировать остальные типы при необходимости
+            }
         }
     }
 
     pub async fn start_heartbeat_loop(self: Arc<Self>) {
         let mut ticker = interval(Duration::from_secs(HEARTBEAT_INTERVAL_SECS));
         log::info!("[{}] 💓 Heartbeat loop started", self.config.node_id);
+
         loop {
             ticker.tick().await;
+
             let uptime = self.started_at.elapsed().as_secs();
             let peer_count = self.connections.read().await.len();
-            let hb = PacketBuilder::new(&self.config.node_id).build(
-                FederationMessage::Heartbeat(crate::network::HeartbeatPayload {
+
+            let hb_packet = PacketBuilder::new(&self.config.node_id).build(FederationMessage::Heartbeat(
+                crate::network::HeartbeatPayload {
                     node_id: self.config.node_id.clone(),
                     timestamp: chrono::Utc::now().timestamp_millis(),
                     uptime_seconds: uptime,
                     load_factor: peer_count as f64 / self.config.max_peers as f64,
-                }),
-            );
-            let peer_ids: Vec<String> = self.connections.read().await.keys().cloned().collect();
+                },
+            ));
+
+            // Снимок peer_ids
+            let peer_ids: Vec<String> = {
+                let conns = self.connections.read().await;
+                conns.keys().cloned().collect()
+            };
+
             for peer_id in peer_ids {
-                let mut conns = self.connections.write().await;
-                if let Some(conn) = conns.get_mut(&peer_id) {
-                    if let Err(e) = conn.send_packet(&hb).await {
+                let conn_arc = {
+                    let conns = self.connections.read().await;
+                    conns.get(&peer_id).cloned()
+                };
+
+                if let Some(conn_arc) = conn_arc {
+                    let mut conn = conn_arc.lock().await;
+                    if let Err(e) = conn.send_packet(&hb_packet).await {
                         log::warn!("Heartbeat failed for {}: {}", peer_id, e);
                     }
                 }
@@ -337,6 +472,7 @@ impl FederationNode {
         let ssau = self.ssau_table.read().await;
         let processed = *self.packets_processed.lock().await;
         let trust = self.trust_registry.read().await;
+
         NodeStatus {
             node_id: self.config.node_id.clone(),
             listen_addr: self.config.listen_addr.to_string(),
@@ -364,7 +500,8 @@ pub struct NodeStatus {
 
 impl std::fmt::Display for NodeStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,
+        write!(
+            f,
             "═══════════════════════════════════════\n\
              FEDERATION NODE STATUS\n\
              ═══════════════════════════════════════\n\
@@ -376,8 +513,14 @@ impl std::fmt::Display for NodeStatus {
              Uptime:   {}s\n\
              Trust:    {}\n\
              ═══════════════════════════════════════",
-            self.node_id, self.listen_addr, self.active_peers, self.peer_ids,
-            self.ssau_entries, self.packets_processed, self.uptime_seconds, self.trust_stats)
+            self.node_id,
+            self.listen_addr,
+            self.active_peers,
+            self.peer_ids,
+            self.ssau_entries,
+            self.packets_processed,
+            self.uptime_seconds,
+            self.trust_stats
+        )
     }
 }
-EOF
