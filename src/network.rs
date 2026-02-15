@@ -1,4 +1,3 @@
-cat > src/network.rs << 'EOF'
 use crate::tensor::SsauTensor;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -7,18 +6,31 @@ use uuid::Uuid;
 
 pub const PROTOCOL_VERSION: u8 = 1;
 
+// -----------------------------------------------------------------------------
+// Сообщения протокола
+// -----------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", content = "payload")]
 pub enum FederationMessage {
     Handshake(HandshakePayload),
     HandshakeAck(HandshakeAckPayload),
+
     SsauUpdate(SsauUpdatePayload),
+
     RouteRequest(RouteRequestPayload),
     RouteResponse(RouteResponsePayload),
+
     Heartbeat(HeartbeatPayload),
+
     Goodbye { node_id: String, reason: String },
+
     NodeDiscovered(NodeInfo),
 }
+
+// -----------------------------------------------------------------------------
+// Handshake
+// -----------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HandshakePayload {
@@ -46,6 +58,10 @@ pub struct NodeCapabilities {
     pub supports_storage: bool,
     pub supports_consensus: bool,
 }
+
+// -----------------------------------------------------------------------------
+// SSAU update
+// -----------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SsauUpdatePayload {
@@ -83,6 +99,10 @@ impl From<&SsauTensor> for SsauTensorMessage {
     }
 }
 
+// -----------------------------------------------------------------------------
+// Маршрутизация (запрос/ответ)
+// -----------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct RouteRequestPayload {
     pub request_id: String,
@@ -105,6 +125,10 @@ pub struct RouteResponsePayload {
     pub error: Option<String>,
 }
 
+// -----------------------------------------------------------------------------
+// Heartbeat
+// -----------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HeartbeatPayload {
     pub node_id: String,
@@ -112,6 +136,10 @@ pub struct HeartbeatPayload {
     pub uptime_seconds: u64,
     pub load_factor: f64,
 }
+
+// -----------------------------------------------------------------------------
+// Discovery
+// -----------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NodeInfo {
@@ -122,23 +150,34 @@ pub struct NodeInfo {
     pub capabilities: NodeCapabilities,
 }
 
+// -----------------------------------------------------------------------------
+// Packet envelope
+// -----------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FederationPacket {
     pub header: PacketHeader,
     pub message: FederationMessage,
-    pub signature: String,
+    /// В MVP подписи нет (None). В будущем: Ed25519/Noise.
+    pub signature: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PacketHeader {
     pub packet_id: String,
     pub sender_id: String,
+    /// Может быть None (например, handshake до того, как знаем peer_id)
     pub recipient_id: Option<String>,
     pub created_at: i64,
     pub protocol_version: u8,
     pub ttl: u8,
+    /// Размер полезной нагрузки = bytes(message)
     pub payload_size: u32,
 }
+
+// -----------------------------------------------------------------------------
+// Builder
+// -----------------------------------------------------------------------------
 
 pub struct PacketBuilder {
     sender_id: String,
@@ -148,7 +187,11 @@ pub struct PacketBuilder {
 
 impl PacketBuilder {
     pub fn new(sender_id: &str) -> Self {
-        Self { sender_id: sender_id.to_string(), recipient_id: None, ttl: 64 }
+        Self {
+            sender_id: sender_id.to_string(),
+            recipient_id: None,
+            ttl: 64,
+        }
     }
 
     pub fn to(mut self, recipient_id: &str) -> Self {
@@ -163,9 +206,17 @@ impl PacketBuilder {
 
     pub fn build(self, message: FederationMessage) -> FederationPacket {
         use std::time::{SystemTime, UNIX_EPOCH};
-        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64;
-        let payload_json = serde_json::to_string(&message).unwrap_or_default();
-        let payload_size = payload_json.len() as u32;
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis() as i64;
+
+        // payload_size = размер message в байтах
+        let payload_size = serde_json::to_vec(&message)
+            .map(|v| v.len() as u32)
+            .unwrap_or(0);
+
         FederationPacket {
             header: PacketHeader {
                 packet_id: Uuid::new_v4().to_string(),
@@ -177,10 +228,14 @@ impl PacketBuilder {
                 payload_size,
             },
             message,
-            signature: "placeholder_sig_v1".to_string(),
+            signature: None,
         }
     }
 }
+
+// -----------------------------------------------------------------------------
+// Serialization
+// -----------------------------------------------------------------------------
 
 pub fn serialize_packet(packet: &FederationPacket) -> Result<Vec<u8>, serde_json::Error> {
     serde_json::to_vec(packet)
@@ -189,6 +244,23 @@ pub fn serialize_packet(packet: &FederationPacket) -> Result<Vec<u8>, serde_json
 pub fn deserialize_packet(bytes: &[u8]) -> Result<FederationPacket, serde_json::Error> {
     serde_json::from_slice(bytes)
 }
+
+// -----------------------------------------------------------------------------
+// TTL hop helper
+// -----------------------------------------------------------------------------
+
+/// Уменьшить TTL на 1. Если TTL=0 → пакет должен быть отброшен.
+pub fn hop(mut packet: FederationPacket) -> Option<FederationPacket> {
+    if packet.header.ttl == 0 {
+        return None;
+    }
+    packet.header.ttl -= 1;
+    Some(packet)
+}
+
+// -----------------------------------------------------------------------------
+// In-process simulation types (если нужны)
+// -----------------------------------------------------------------------------
 
 pub type PacketSender = mpsc::Sender<FederationPacket>;
 pub type PacketReceiver = mpsc::Receiver<FederationPacket>;
@@ -248,18 +320,43 @@ impl NodeContext {
         sent
     }
 
-    pub async fn process_next(&mut self) -> Option<FederationPacket> {
+    /// Non-blocking poll (симуляция)
+    pub fn try_process_next(&mut self) -> Option<FederationPacket> {
         match self.inbox.try_recv() {
-            Ok(packet) => { self.packets_processed += 1; Some(packet) }
+            Ok(packet) => {
+                self.packets_processed += 1;
+                Some(packet)
+            }
             Err(_) => None,
+        }
+    }
+
+    /// Blocking await (лучше для реальной логики)
+    pub async fn process_next(&mut self) -> Option<FederationPacket> {
+        match self.inbox.recv().await {
+            Some(packet) => {
+                self.packets_processed += 1;
+                Some(packet)
+            }
+            None => None,
         }
     }
 }
 
-pub fn create_handshake_packet(our_node_id: &str, their_node_id: &str, public_key: &str, known_peers: u32) -> FederationPacket {
+// -----------------------------------------------------------------------------
+// Packet factories
+// -----------------------------------------------------------------------------
+
+/// Handshake пакет. recipient_id оставляем None, потому что peer_id может быть неизвестен.
+pub fn create_handshake_packet(
+    our_node_id: &str,
+    public_key: &str,
+    known_peers: u32,
+) -> FederationPacket {
     use std::time::{SystemTime, UNIX_EPOCH};
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64;
-    PacketBuilder::new(our_node_id).to(their_node_id).build(FederationMessage::Handshake(HandshakePayload {
+
+    PacketBuilder::new(our_node_id).build(FederationMessage::Handshake(HandshakePayload {
         node_id: our_node_id.to_string(),
         protocol_version: PROTOCOL_VERSION,
         public_key: public_key.to_string(),
@@ -282,4 +379,3 @@ pub fn create_ssau_update_packet(our_node_id: &str, tensors: &[&SsauTensor], seq
         sequence,
     }))
 }
-EOF
