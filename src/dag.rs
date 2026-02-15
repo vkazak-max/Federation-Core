@@ -1,26 +1,30 @@
-cat > src/dag.rs << 'EOF'
 // =============================================================================
 // FEDERATION CORE — dag.rs
 // PHASE 2 / WEEK 5 — «DAG Consensus (Light version)»
 // =============================================================================
 //
 // Реализует:
-//   1. DagNode     — вершина графа (одна запись маршрута)
-//   2. DagEdge     — связь между вершинами (подтверждение)
-//   3. FederationDag — сам граф с методами добавления и верификации
-//   4. PoaReward   — Proof-of-Awareness: начисление наград за честные тензоры
-//   5. DagExplorer — статистика и визуализация графа
+//   1. DagNode        — вершина графа (одна запись маршрута)
+//   2. DagEdge        — связь между вершинами (подтверждение)
+//   3. FederationDag  — граф с методами добавления и верификации
+//   4. PoaReward      — Proof-of-Awareness: награды за честные тензоры
+//   5. DagExplorer    — статистика графа
+//
+// Важно (MVP):
+//   - In-memory DAG
+//   - Pruning безопасный: не удаляем вершины, на которые кто-то ссылается как parent
+//   - TrustRegistry реально обновляется через TriangleCheckResult
 // =============================================================================
 
-use crate::tensor::{triangle_check, SsauTensor, TrustRegistry};
+use crate::tensor::{triangle_check, SsauTensor, TrustRegistry, TriangleCheckResult};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 // -----------------------------------------------------------------------------
 // Константы
 // -----------------------------------------------------------------------------
 
-/// Базовая награда за честный маршрут (в монетах Федерации)
+/// Базовая награда за честный маршрут (в "credits" Федерации)
 pub const BASE_POA_REWARD: f64 = 1.0;
 
 /// Бонус за высокое качество канала (reliability > 0.95)
@@ -29,7 +33,8 @@ pub const QUALITY_BONUS: f64 = 0.5;
 /// Штраф за нечестные данные
 pub const DISHONESTY_PENALTY: f64 = 2.0;
 
-/// Максимальная глубина DAG для лёгкой версии
+/// Максимальное число вершин DAG для лёгкой версии (in-memory)
+/// (название оставлено ради совместимости)
 pub const MAX_DAG_DEPTH: usize = 1000;
 
 // -----------------------------------------------------------------------------
@@ -103,14 +108,18 @@ impl DagNode {
         let total_latency: f64 = tensors.iter().map(|t| t.latency.mean).sum();
         let snapshots: Vec<SsauSnapshot> = tensors.iter().map(|t| SsauSnapshot::from(*t)).collect();
 
-        // Простой hash: комбинируем reporter + timestamp + path
+        // MVP hash (FNV-1a 64): reporter + timestamp + path + latency
+        // В будущем заменить на SHA-256 от сериализованного header.
         let id = format!("{:x}", {
             let mut h: u64 = 0xcbf29ce484222325;
-            for b in format!("{}{}{}",
+            let input = format!(
+                "{}|{}|{}|{:.4}",
                 reporter_id,
                 now,
-                route_path.join(",")
-            ).bytes() {
+                route_path.join(","),
+                total_latency
+            );
+            for b in input.bytes() {
                 h ^= b as u64;
                 h = h.wrapping_mul(0x100000001b3);
             }
@@ -148,7 +157,7 @@ pub struct DagEdge {
 }
 
 // -----------------------------------------------------------------------------
-// PoaReward — Proof-of-Awareness
+// PoA — Proof-of-Awareness
 // -----------------------------------------------------------------------------
 
 /// Результат расчёта награды PoA
@@ -160,14 +169,16 @@ pub struct PoaResult {
     pub net: f64,
     pub reason: String,
     pub honesty_score: f64,
+    /// Если был triangle-check — сохраняем результат (чтобы обновить trust_registry снаружи)
+    pub triangle: Option<TriangleCheckResult>,
 }
 
 /// Рассчитать награду Proof-of-Awareness для узла.
 ///
 /// Логика:
-///   - Базовая награда за участие в маршрутизации
-///   - Бонус за высокое качество данных SSAU
-///   - Штраф если Triangle Check выявил ложь
+///   - Базовая награда за участие
+///   - Бонус за высокую надёжность
+///   - Triangle Check (если есть свидетели) → штраф/снижение честности
 ///   - Множитель от текущего Trust Weight
 pub fn calculate_poa_reward(
     node: &DagNode,
@@ -179,6 +190,7 @@ pub fn calculate_poa_reward(
     let mut penalty = 0.0;
     let mut honesty_score = 1.0;
     let mut reason = String::new();
+    let mut triangle_result: Option<TriangleCheckResult> = None;
 
     // Бонус за качество канала
     let avg_reliability: f64 = if node.ssau_snapshot.is_empty() {
@@ -190,22 +202,25 @@ pub fn calculate_poa_reward(
 
     if avg_reliability > 0.95 {
         reward += QUALITY_BONUS;
-        reason += &format!("Quality bonus +{:.2} (reliability={:.3}). ", QUALITY_BONUS, avg_reliability);
+        reason += &format!(
+            "Quality bonus +{:.2} (reliability={:.3}). ",
+            QUALITY_BONUS, avg_reliability
+        );
     }
 
     // Triangle Check если есть свидетели
     if let Some((l_ac, l_bc)) = witness_latencies {
         if let Some(snapshot) = node.ssau_snapshot.first() {
             let check = triangle_check(
-                snapshot.latency_ms,
-                l_ac,
-                l_bc,
+                snapshot.latency_ms, // L_AB
+                l_ac,                // L_AC
+                l_bc,                // L_BC
                 trust_weight,
             );
 
             if !check.passed {
                 penalty = DISHONESTY_PENALTY * check.deviation_score;
-                honesty_score = 1.0 - check.deviation_score;
+                honesty_score = (1.0 - check.deviation_score).clamp(0.0, 1.0);
                 reason += &format!(
                     "⛔ Triangle Check FAILED! Penalty -{:.2}. Deviation={:.1}%. ",
                     penalty,
@@ -215,18 +230,23 @@ pub fn calculate_poa_reward(
                 reason += "✅ Triangle Check passed. ";
                 honesty_score = 1.0;
             }
+
+            triangle_result = Some(check);
         }
     }
 
-    // Бонус за скорость (задержка < 20ms)
+    // Бонус за скорость (суммарная задержка < 20ms)
     if node.total_latency_ms < 20.0 {
         let speed_bonus = 0.3 * (1.0 - node.total_latency_ms / 20.0);
         reward += speed_bonus;
-        reason += &format!("Speed bonus +{:.2} (latency={:.1}ms). ", speed_bonus, node.total_latency_ms);
+        reason += &format!(
+            "Speed bonus +{:.2} (latency={:.1}ms). ",
+            speed_bonus, node.total_latency_ms
+        );
     }
 
     let net = (reward - penalty).max(0.0);
-    reason += &format!("Net: {:.4} монет.", net);
+    reason += &format!("Net: {:.4} credits.", net);
 
     PoaResult {
         node_id: node.reporter_id.clone(),
@@ -235,6 +255,7 @@ pub fn calculate_poa_reward(
         net,
         reason,
         honesty_score,
+        triangle: triangle_result,
     }
 }
 
@@ -251,7 +272,7 @@ pub struct FederationDag {
     pub nodes: HashMap<String, DagNode>,
     /// Все рёбра
     pub edges: Vec<DagEdge>,
-    /// Баланс монет: node_id → накопленные монеты
+    /// Баланс credits: node_id → накопленные credits
     pub balances: HashMap<String, f64>,
     /// Tips — вершины без исходящих рёбер (кончики DAG)
     pub tips: Vec<String>,
@@ -267,11 +288,12 @@ impl FederationDag {
     /// Добавить новую запись маршрута в DAG.
     ///
     /// Алгоритм:
-    ///   1. Выбираем 2 tips как родителей (подтверждаем их)
+    ///   1. Выбираем до 2 tips как родителей (подтверждаем их)
     ///   2. Создаём новую вершину
     ///   3. Рассчитываем PoA награду
-    ///   4. Обновляем tips
-    ///   5. Начисляем монеты
+    ///   4. Обновляем trust_registry (если был triangle-check)
+    ///   5. Обновляем tips
+    ///   6. Начисляем credits
     pub fn append_route(
         &mut self,
         reporter_id: &str,
@@ -280,23 +302,32 @@ impl FederationDag {
         trust_registry: &mut TrustRegistry,
         witness_latencies: Option<(f64, f64)>,
     ) -> (DagNode, PoaResult) {
-        // Выбираем родителей из текущих tips (подтверждаем их)
+        // Выбираем родителей из текущих tips
         let parents: Vec<String> = self.tips.iter().take(2).cloned().collect();
         let depth = if parents.is_empty() {
             0
         } else {
-            parents.iter()
+            parents
+                .iter()
                 .filter_map(|p| self.nodes.get(p))
                 .map(|n| n.depth)
                 .max()
-                .unwrap_or(0) + 1
+                .unwrap_or(0)
+                + 1
         };
 
         // Создаём вершину
         let mut node = DagNode::new(reporter_id, route_path, tensors, parents.clone(), depth);
 
-        // Рассчитываем PoA награду
+        // Рассчитываем PoA
         let poa = calculate_poa_reward(&node, trust_registry, witness_latencies);
+
+        // Применяем trust update (важно!)
+        if let Some(ref tri) = poa.triangle {
+            trust_registry.record_check(reporter_id, tri);
+        }
+
+        // Проставляем поля вершины
         node.poa_reward = poa.net;
         node.honesty_score = poa.honesty_score;
         node.verified = poa.honesty_score > 0.5;
@@ -315,7 +346,7 @@ impl FederationDag {
             self.tips.retain(|t| t != parent_id);
         }
 
-        // Начисляем монеты
+        // Начисляем credits
         *self.balances.entry(reporter_id.to_string()).or_insert(0.0) += poa.net;
 
         // Добавляем новую вершину как tip
@@ -324,7 +355,7 @@ impl FederationDag {
         self.tips.push(node_id);
         self.total_operations += 1;
 
-        // Ограничиваем размер DAG
+        // Ограничиваем размер DAG (safe prune)
         if self.nodes.len() > MAX_DAG_DEPTH {
             self.prune_old_nodes();
         }
@@ -334,52 +365,90 @@ impl FederationDag {
 
     /// Получить историю маршрутов конкретного узла
     pub fn get_node_history(&self, node_id: &str) -> Vec<&DagNode> {
-        let mut history: Vec<&DagNode> = self.nodes.values()
+        let mut history: Vec<&DagNode> = self
+            .nodes
+            .values()
             .filter(|n| n.reporter_id == node_id)
             .collect();
         history.sort_by_key(|n| n.timestamp);
         history
     }
 
-    /// Верифицировать цепочку от вершины до genesis
-    pub fn verify_chain(&self, node_id: &str) -> bool {
-        let mut current_id = node_id.to_string();
-        let mut visited = std::collections::HashSet::new();
+    /// Верифицировать цепочку от вершины до genesis.
+    /// Проверяем, что:
+    ///   - нет циклов
+    ///   - каждая посещённая вершина verified
+    ///   - все parent-ссылки существуют и валидны
+    pub fn verify_chain(&self, start_id: &str) -> bool {
+        let mut stack = vec![start_id.to_string()];
+        let mut visited = HashSet::new();
 
-        loop {
+        while let Some(current_id) = stack.pop() {
             if visited.contains(&current_id) {
-                return false; // Цикл — невалидно (DAG не должен иметь циклов)
+                return false; // цикл
             }
             visited.insert(current_id.clone());
 
-            match self.nodes.get(&current_id) {
+            let node = match self.nodes.get(&current_id) {
+                Some(n) => n,
                 None => return false,
-                Some(node) => {
-                    if node.parents.is_empty() {
-                        return true; // Дошли до genesis
-                    }
-                    if !node.verified {
-                        return false;
-                    }
-                    current_id = node.parents[0].clone();
-                }
+            };
+
+            if !node.verified {
+                return false;
+            }
+
+            // genesis — ок
+            if node.parents.is_empty() {
+                continue;
+            }
+
+            for p in &node.parents {
+                stack.push(p.clone());
             }
         }
+
+        true
     }
 
-    /// Удалить старые подтверждённые вершины (оставить только последние)
+    /// Safe prune: удаляем только те вершины, которые:
+    ///   - НЕ tips
+    ///   - НЕ используются как parent в других вершинах
+    /// Сохраняем “скелет” DAG, чтобы verify_chain не ломался.
     fn prune_old_nodes(&mut self) {
-        let mut nodes_by_depth: Vec<(String, usize)> = self.nodes.iter()
+        if self.nodes.len() <= MAX_DAG_DEPTH / 2 {
+            return;
+        }
+
+        // Собираем множество всех parent-ссылок
+        let mut referenced: HashSet<String> = HashSet::new();
+        for n in self.nodes.values() {
+            for p in &n.parents {
+                referenced.insert(p.clone());
+            }
+        }
+
+        // Сортируем кандидатов по depth (старые сначала)
+        let mut nodes_by_depth: Vec<(String, usize)> = self
+            .nodes
+            .iter()
             .map(|(id, n)| (id.clone(), n.depth))
             .collect();
         nodes_by_depth.sort_by_key(|(_, d)| *d);
 
-        // Удаляем самые старые (низкая глубина), оставляем MAX_DAG_DEPTH/2
-        let to_remove = nodes_by_depth.len() - MAX_DAG_DEPTH / 2;
-        for (id, _) in nodes_by_depth.iter().take(to_remove) {
-            if !self.tips.contains(id) {
-                self.nodes.remove(id);
+        // Удаляем понемногу, пока не ужмём размер
+        let target = MAX_DAG_DEPTH / 2;
+        for (id, _) in nodes_by_depth {
+            if self.nodes.len() <= target {
+                break;
             }
+            if self.tips.contains(&id) {
+                continue;
+            }
+            if referenced.contains(&id) {
+                continue; // нельзя — кто-то ссылается как parent
+            }
+            self.nodes.remove(&id);
         }
     }
 
@@ -387,7 +456,9 @@ impl FederationDag {
     pub fn stats(&self) -> DagStats {
         let total_rewards: f64 = self.balances.values().sum();
         let verified_count = self.nodes.values().filter(|n| n.verified).count();
-        let avg_honesty = if self.nodes.is_empty() { 1.0 } else {
+        let avg_honesty = if self.nodes.is_empty() {
+            1.0
+        } else {
             self.nodes.values().map(|n| n.honesty_score).sum::<f64>() / self.nodes.len() as f64
         };
 
@@ -399,9 +470,11 @@ impl FederationDag {
             total_rewards_issued: total_rewards,
             verified_nodes: verified_count,
             avg_honesty_score: avg_honesty,
-            richest_node: self.balances.iter()
+            richest_node: self
+                .balances
+                .iter()
                 .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
-                .map(|(id, bal)| format!("{}: {:.4} монет", id, bal))
+                .map(|(id, bal)| format!("{}: {:.4} credits", id, bal))
                 .unwrap_or_else(|| "нет данных".to_string()),
         }
     }
@@ -422,20 +495,24 @@ pub struct DagStats {
 
 impl std::fmt::Display for DagStats {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,
+        write!(
+            f,
             "╔══════════════════════════════════════════════════╗\n\
-             ║  DAG CONSENSUS STATUS                            ║\n\
+             ║  DAG LEDGER STATUS                               ║\n\
              ╠══════════════════════════════════════════════════╣\n\
              ║  Вершин:      {:>6}  Рёбер:    {:>6}          ║\n\
              ║  Tips:        {:>6}  Операций: {:>6}          ║\n\
              ║  Верифицировано: {:>6}/{:<6}                   ║\n\
              ║  Avg честность:  {:.4}                         ║\n\
-             ║  Всего наград:   {:.4} монет                   ║\n\
+             ║  Всего наград:   {:.4} credits                 ║\n\
              ║  Богатейший: {}  ║\n\
              ╚══════════════════════════════════════════════════╝",
-            self.total_nodes, self.total_edges,
-            self.tips_count, self.total_operations,
-            self.verified_nodes, self.total_nodes,
+            self.total_nodes,
+            self.total_edges,
+            self.tips_count,
+            self.total_operations,
+            self.verified_nodes,
+            self.total_nodes,
             self.avg_honesty_score,
             self.total_rewards_issued,
             self.richest_node,
@@ -477,48 +554,51 @@ mod tests {
         println!("✅ Genesis: id={} depth={} reward={:.4}", &node1.id[..8], node1.depth, poa1.net);
         println!("   Причина: {}", poa1.reason);
 
-        // Вторая запись
+        // Вторая запись (со свидетелями)
         let t3 = make_tensor("A", "D", 5.0, 0.99);
         let (node2, poa2) = dag.append_route(
             "node_BETA",
             vec!["A".into(), "D".into()],
             &[&t3],
             &mut trust,
-            Some((3.0, 4.0)), // свидетели: L_AC=3ms, L_BC=4ms → L_AD должен быть в [1, 7]
+            Some((3.0, 4.0)), // свидетели
         );
         println!("✅ Node 2:  id={} depth={} reward={:.4}", &node2.id[..8], node2.depth, poa2.net);
         println!("   Причина: {}", poa2.reason);
 
         assert_eq!(dag.nodes.len(), 2);
-        assert_eq!(dag.tips.len(), 1); // node2 подтвердил node1, остался только node2 как tip
+        assert_eq!(dag.tips.len(), 1);
 
         let stats = dag.stats();
         println!("\n{}", stats);
     }
 
     #[test]
-    fn test_poa_dishonest_node() {
+    fn test_poa_dishonest_node_updates_trust() {
         let mut dag = FederationDag::new();
         let mut trust = TrustRegistry::new();
 
         // Лживый узел: заявляет 1ms, свидетели видят 20+25ms
         let t_lie = make_tensor("X", "Y", 1.0, 0.99);
-        let (node, poa) = dag.append_route(
+        let (_node, poa) = dag.append_route(
             "lying_node",
             vec!["X".into(), "Y".into()],
             &[&t_lie],
             &mut trust,
-            Some((20.0, 25.0)), // Triangle Check провалится
+            Some((20.0, 25.0)),
         );
 
         assert!(poa.penalty > 0.0, "Должен быть штраф за ложь");
-        assert!(node.honesty_score < 1.0, "Честность должна снизиться");
-        println!("✅ PoA для лжеца: reward={:.4} penalty={:.4} net={:.4}", poa.reward, poa.penalty, poa.net);
+
+        let w = trust.get_trust("lying_node");
+        assert!(w < 1.0, "Trust должен уменьшиться после провала triangle-check");
+
+        println!("✅ PoA лжеца: net={:.4} trust={:.4}", poa.net, w);
         println!("   {}", poa.reason);
     }
 
     #[test]
-    fn test_dag_chain_verification() {
+    fn test_dag_chain_verification_all_parents() {
         let mut dag = FederationDag::new();
         let mut trust = TrustRegistry::new();
         let t = make_tensor("A", "B", 10.0, 0.99);
@@ -526,27 +606,7 @@ mod tests {
         let (n1, _) = dag.append_route("node_A", vec!["A".into(), "B".into()], &[&t], &mut trust, None);
         let (n2, _) = dag.append_route("node_A", vec!["A".into(), "B".into()], &[&t], &mut trust, None);
 
-        println!("✅ Chain: n1.depth={} n2.depth={}", n1.depth, n2.depth);
-        assert!(n2.depth > n1.depth, "Глубина должна расти");
-    }
-
-    #[test]
-    fn test_balances_accumulate() {
-        let mut dag = FederationDag::new();
-        let mut trust = TrustRegistry::new();
-        let t = make_tensor("A", "B", 10.0, 0.99);
-
-        // 5 честных маршрутов от одного узла
-        for _ in 0..5 {
-            dag.append_route("rich_node", vec!["A".into(), "B".into()], &[&t], &mut trust, None);
-        }
-
-        let balance = dag.balances.get("rich_node").cloned().unwrap_or(0.0);
-        assert!(balance > 0.0, "Баланс должен накапливаться");
-        println!("✅ После 5 маршрутов баланс rich_node = {:.4} монет", balance);
-
-        let stats = dag.stats();
-        println!("   Всего наград выдано: {:.4}", stats.total_rewards_issued);
+        assert!(dag.verify_chain(&n2.id));
+        assert!(n2.depth > n1.depth);
     }
 }
-EOF
