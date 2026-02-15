@@ -3,13 +3,23 @@ name = "federation-core"
 version = "0.2.0"
 edition = "2021"
 authors = ["vkazak"]
+license = "MIT"
+description = "Federation Core — Overlay Network with SSAU, DAG Consensus, ZKP Onion and Active Mimicry"
+repository = "https://github.com/vkazak/federation-core"
 
 [dependencies]
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.37", features = ["full"] }
+
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
 chrono = { version = "0.4", features = ["serde"] }
+
+uuid = { version = "1.7", features = ["v4", "serde"] }
+
 rand = "0.8"
+
 log = "0.4"
 env_logger = "0.10"
+
 futures = "0.3"
