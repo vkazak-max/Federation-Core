@@ -6,9 +6,9 @@ use uuid::Uuid;
 
 pub const PROTOCOL_VERSION: u8 = 1;
 
-// -----------------------------------------------------------------------------
-// Сообщения протокола
-// -----------------------------------------------------------------------------
+// =============================================================================
+// Messages
+// =============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", content = "payload")]
@@ -21,16 +21,19 @@ pub enum FederationMessage {
     RouteRequest(RouteRequestPayload),
     RouteResponse(RouteResponsePayload),
 
-    Heartbeat(HeartbeatPayload),
+    /// NEW: Onion relay (Phase 2 / Week 8)
+    OnionRelay(OnionRelayPayload),
 
+    Heartbeat(HeartbeatPayload),
     Goodbye { node_id: String, reason: String },
 
+    /// MVP discovery
     NodeDiscovered(NodeInfo),
 }
 
-// -----------------------------------------------------------------------------
+// =============================================================================
 // Handshake
-// -----------------------------------------------------------------------------
+// =============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HandshakePayload {
@@ -59,9 +62,9 @@ pub struct NodeCapabilities {
     pub supports_consensus: bool,
 }
 
-// -----------------------------------------------------------------------------
-// SSAU update
-// -----------------------------------------------------------------------------
+// =============================================================================
+// SSAU Update
+// =============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SsauUpdatePayload {
@@ -99,9 +102,9 @@ impl From<&SsauTensor> for SsauTensorMessage {
     }
 }
 
-// -----------------------------------------------------------------------------
-// Маршрутизация (запрос/ответ)
-// -----------------------------------------------------------------------------
+// =============================================================================
+// Routing (request/response)
+// =============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct RouteRequestPayload {
@@ -125,9 +128,48 @@ pub struct RouteResponsePayload {
     pub error: Option<String>,
 }
 
-// -----------------------------------------------------------------------------
-// Heartbeat
-// -----------------------------------------------------------------------------
+// =============================================================================
+// NEW: Onion Relay (Week 8)
+// =============================================================================
+//
+// Идея: OnionPacket (из zkp.rs) сериализуем в JSON bytes и шлём как blob.
+// Узел получает OnionRelay, проверяет ttl, при желании anti-replay (nullifier)
+// и форвардит дальше по next_hop.
+//
+// Важно: мы НЕ кладём сюда тип OnionPacket напрямую, чтобы network.rs не зависел
+// от zkp.rs модульно. Мы передаём blob.
+//
+// later: можно добавить подпись, MAC, и шифрование транспорта.
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct OnionRelayPayload {
+    /// request/circuit id (для логов/дебага)
+    pub relay_id: String,
+    /// узел, который отправил этот relay hop
+    pub origin_node_id: String,
+    /// куда переслать дальше (next hop id)
+    pub next_hop: String,
+    /// сколько hop осталось (механика TTL поверх overlay)
+    pub hop_ttl: u8,
+    /// сериализованный onion-пакет/слой
+    pub onion: OnionBlob,
+    /// timestamp ms
+    pub created_at: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct OnionBlob {
+    /// codec = "json_v1" (потом можно "bincode_v1")
+    pub codec: String,
+    /// bytes: JSON bytes (Vec<u8>) — serde нормально сериализует в base64 для JSON
+    pub data: Vec<u8>,
+    /// optional hint size
+    pub size: u32,
+}
+
+// =============================================================================
+// Heartbeat / Discovery
+// =============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct HeartbeatPayload {
@@ -136,10 +178,6 @@ pub struct HeartbeatPayload {
     pub uptime_seconds: u64,
     pub load_factor: f64,
 }
-
-// -----------------------------------------------------------------------------
-// Discovery
-// -----------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct NodeInfo {
@@ -150,15 +188,16 @@ pub struct NodeInfo {
     pub capabilities: NodeCapabilities,
 }
 
-// -----------------------------------------------------------------------------
-// Packet envelope
-// -----------------------------------------------------------------------------
+// =============================================================================
+// Packet format
+// =============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FederationPacket {
     pub header: PacketHeader,
     pub message: FederationMessage,
-    /// В MVP подписи нет (None). В будущем: Ed25519/Noise.
+
+    /// NEW: подпись теперь optional
     pub signature: Option<String>,
 }
 
@@ -166,18 +205,16 @@ pub struct FederationPacket {
 pub struct PacketHeader {
     pub packet_id: String,
     pub sender_id: String,
-    /// Может быть None (например, handshake до того, как знаем peer_id)
     pub recipient_id: Option<String>,
     pub created_at: i64,
     pub protocol_version: u8,
     pub ttl: u8,
-    /// Размер полезной нагрузки = bytes(message)
     pub payload_size: u32,
 }
 
-// -----------------------------------------------------------------------------
+// =============================================================================
 // Builder
-// -----------------------------------------------------------------------------
+// =============================================================================
 
 pub struct PacketBuilder {
     sender_id: String,
@@ -206,16 +243,13 @@ impl PacketBuilder {
 
     pub fn build(self, message: FederationMessage) -> FederationPacket {
         use std::time::{SystemTime, UNIX_EPOCH};
-
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis() as i64;
 
-        // payload_size = размер message в байтах
-        let payload_size = serde_json::to_vec(&message)
-            .map(|v| v.len() as u32)
-            .unwrap_or(0);
+        let payload_json = serde_json::to_vec(&message).unwrap_or_default();
+        let payload_size = payload_json.len() as u32;
 
         FederationPacket {
             header: PacketHeader {
@@ -228,14 +262,14 @@ impl PacketBuilder {
                 payload_size,
             },
             message,
-            signature: None,
+            signature: None, // MVP: пока без подписи
         }
     }
 }
 
-// -----------------------------------------------------------------------------
-// Serialization
-// -----------------------------------------------------------------------------
+// =============================================================================
+// Serialize / Deserialize packet
+// =============================================================================
 
 pub fn serialize_packet(packet: &FederationPacket) -> Result<Vec<u8>, serde_json::Error> {
     serde_json::to_vec(packet)
@@ -245,22 +279,9 @@ pub fn deserialize_packet(bytes: &[u8]) -> Result<FederationPacket, serde_json::
     serde_json::from_slice(bytes)
 }
 
-// -----------------------------------------------------------------------------
-// TTL hop helper
-// -----------------------------------------------------------------------------
-
-/// Уменьшить TTL на 1. Если TTL=0 → пакет должен быть отброшен.
-pub fn hop(mut packet: FederationPacket) -> Option<FederationPacket> {
-    if packet.header.ttl == 0 {
-        return None;
-    }
-    packet.header.ttl -= 1;
-    Some(packet)
-}
-
-// -----------------------------------------------------------------------------
-// In-process simulation types (если нужны)
-// -----------------------------------------------------------------------------
+// =============================================================================
+// In-memory channels (внутренние)
+// =============================================================================
 
 pub type PacketSender = mpsc::Sender<FederationPacket>;
 pub type PacketReceiver = mpsc::Receiver<FederationPacket>;
@@ -278,6 +299,7 @@ impl NodeContext {
     pub fn new(node_id: &str) -> (Self, PacketSender) {
         let (inbox_tx, inbox_rx) = mpsc::channel::<FederationPacket>(256);
         let (outbox_tx, _outbox_rx) = mpsc::channel::<FederationPacket>(256);
+
         let ctx = NodeContext {
             node_id: node_id.to_string(),
             inbox: inbox_rx,
@@ -286,6 +308,7 @@ impl NodeContext {
             packets_processed: 0,
             packets_sent: 0,
         };
+
         (ctx, inbox_tx)
     }
 
@@ -307,6 +330,7 @@ impl NodeContext {
     pub async fn broadcast(&mut self, packet: FederationPacket) -> usize {
         let mut sent = 0;
         let peer_ids: Vec<String> = self.peers.keys().cloned().collect();
+
         for peer_id in peer_ids {
             let mut p = packet.clone();
             p.header.recipient_id = Some(peer_id.clone());
@@ -320,8 +344,7 @@ impl NodeContext {
         sent
     }
 
-    /// Non-blocking poll (симуляция)
-    pub fn try_process_next(&mut self) -> Option<FederationPacket> {
+    pub async fn process_next(&mut self) -> Option<FederationPacket> {
         match self.inbox.try_recv() {
             Ok(packet) => {
                 self.packets_processed += 1;
@@ -330,31 +353,22 @@ impl NodeContext {
             Err(_) => None,
         }
     }
-
-    /// Blocking await (лучше для реальной логики)
-    pub async fn process_next(&mut self) -> Option<FederationPacket> {
-        match self.inbox.recv().await {
-            Some(packet) => {
-                self.packets_processed += 1;
-                Some(packet)
-            }
-            None => None,
-        }
-    }
 }
 
-// -----------------------------------------------------------------------------
-// Packet factories
-// -----------------------------------------------------------------------------
+// =============================================================================
+// Packet helpers
+// =============================================================================
 
-/// Handshake пакет. recipient_id оставляем None, потому что peer_id может быть неизвестен.
 pub fn create_handshake_packet(
     our_node_id: &str,
     public_key: &str,
     known_peers: u32,
 ) -> FederationPacket {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as i64;
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as i64;
 
     PacketBuilder::new(our_node_id).build(FederationMessage::Handshake(HandshakePayload {
         node_id: our_node_id.to_string(),
@@ -378,4 +392,34 @@ pub fn create_ssau_update_packet(our_node_id: &str, tensors: &[&SsauTensor], seq
         tensors: tensor_messages,
         sequence,
     }))
+}
+
+/// NEW helper: создать onion relay пакет
+pub fn create_onion_relay_packet(
+    our_node_id: &str,
+    next_hop: &str,
+    hop_ttl: u8,
+    onion_json_bytes: Vec<u8>,
+) -> FederationPacket {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as i64;
+
+    PacketBuilder::new(our_node_id)
+        .to(next_hop)
+        .with_ttl(hop_ttl)
+        .build(FederationMessage::OnionRelay(OnionRelayPayload {
+            relay_id: Uuid::new_v4().to_string(),
+            origin_node_id: our_node_id.to_string(),
+            next_hop: next_hop.to_string(),
+            hop_ttl,
+            onion: OnionBlob {
+                codec: "json_v1".to_string(),
+                size: onion_json_bytes.len() as u32,
+                data: onion_json_bytes,
+            },
+            created_at: now,
+        }))
 }
