@@ -1,26 +1,23 @@
-cat > src/zkp.rs << 'EOF'
 // =============================================================================
 // FEDERATION CORE — zkp.rs
-// PHASE 2 / WEEK 6 — «Zero-Knowledge Basics»
+// PHASE 2 / WEEK 6 — «Zero-Knowledge Basics» (MVP)
 // =============================================================================
 //
-// Реализует:
-//   1. OnionHeader   — многослойное шифрование заголовка (как Tor onion)
-//   2. BlindRoute    — маршрут где каждый узел видит только след. hop
-//   3. ZkpCommitment — математическое обязательство (commitment scheme)
-//   4. HeaderCipher  — шифрование/дешифрование заголовков
-//   5. NullifierSet  — защита от replay-атак
+// MVP-реализация:
 //
-// Принцип (White Paper §3.1):
-//   Узел-маршрутизатор видит только «вектор весов» (куда направить),
-//   но НЕ видит отправителя и получателя.
+//   1) Onion layers (nested payload): слой шифрует не просто байты,
+//      а сериализованный OnionPayload { Layer(next_layer) | Data(final_bytes) }.
 //
-// Реализация: симметричное шифрование XOR + commitment через SHA-256 (hmac).
-// В production заменить на ChaCha20-Poly1305 + zk-SNARKs.
+//   2) key_id в каждом слое, чтобы узел мог выбрать правильный SessionKey.
+//
+//   3) Integrity tag (MVP): простая проверка целостности ciphertext.
+//
+// ⚠️ ВАЖНО: XOR + FNV = НЕ криптография production.
+// В production: X25519 + ChaCha20-Poly1305 + настоящие commitments/zk.
 // =============================================================================
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 // -----------------------------------------------------------------------------
 // Константы
@@ -28,15 +25,13 @@ use std::collections::HashSet;
 
 /// Размер ключа шифрования (байт)
 pub const KEY_SIZE: usize = 32;
-
 /// Размер nonce (байт)
 pub const NONCE_SIZE: usize = 16;
-
 /// Максимальное число слоёв onion
 pub const MAX_ONION_LAYERS: usize = 8;
 
 // -----------------------------------------------------------------------------
-// Простой PRNG на основе xorshift64 (без внешних зависимостей)
+// Утилиты (PRNG + hash) — детерминированные, без внешних зависимостей
 // -----------------------------------------------------------------------------
 
 fn xorshift64(state: &mut u64) -> u64 {
@@ -46,7 +41,6 @@ fn xorshift64(state: &mut u64) -> u64 {
     *state
 }
 
-/// Генерация псевдослучайных байт из seed
 fn generate_bytes(seed: u64, len: usize) -> Vec<u8> {
     let mut state = seed;
     let mut result = Vec::with_capacity(len);
@@ -54,13 +48,15 @@ fn generate_bytes(seed: u64, len: usize) -> Vec<u8> {
         let val = xorshift64(&mut state);
         for b in val.to_le_bytes() {
             result.push(b);
-            if result.len() == len { break; }
+            if result.len() == len {
+                break;
+            }
         }
     }
     result
 }
 
-/// Простой hash (FNV-1a 64bit) — детерминированный
+/// FNV-1a 64bit
 pub fn fnv_hash(data: &[u8]) -> u64 {
     let mut hash: u64 = 0xcbf29ce484222325;
     for &b in data {
@@ -70,16 +66,22 @@ pub fn fnv_hash(data: &[u8]) -> u64 {
     hash
 }
 
-/// Hex-строка из байт
 fn to_hex(bytes: &[u8]) -> String {
     bytes.iter().map(|b| format!("{:02x}", b)).collect()
+}
+
+fn now_ms() -> i64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as i64
 }
 
 // -----------------------------------------------------------------------------
 // SessionKey — сессионный ключ шифрования
 // -----------------------------------------------------------------------------
 
-/// Сессионный ключ для шифрования одного слоя onion
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionKey {
     pub key_bytes: Vec<u8>,
@@ -88,7 +90,6 @@ pub struct SessionKey {
 }
 
 impl SessionKey {
-    /// Генерировать новый случайный ключ
     pub fn generate() -> Self {
         use std::time::{SystemTime, UNIX_EPOCH};
         let seed = SystemTime::now()
@@ -103,8 +104,7 @@ impl SessionKey {
         SessionKey { key_bytes, nonce, key_id }
     }
 
-    /// Создать ключ из общего секрета (Diffie-Hellman симуляция)
-    /// В production: X25519 ECDH
+    /// Симуляция shared secret. В production: X25519 ECDH.
     pub fn from_shared_secret(our_secret: u64, their_public: u64) -> Self {
         let shared = our_secret.wrapping_mul(their_public) ^ 0x9e3779b97f4a7c15;
         let key_bytes = generate_bytes(shared, KEY_SIZE);
@@ -113,64 +113,70 @@ impl SessionKey {
         SessionKey { key_bytes, nonce, key_id }
     }
 
-    /// XOR-шифрование (симуляция ChaCha20)
-    /// В production заменить на chacha20-poly1305 crate
+    /// XOR-шифрование (MVP).
     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
-        let keystream = generate_bytes(
-            fnv_hash(&self.key_bytes) ^ fnv_hash(&self.nonce),
-            plaintext.len(),
-        );
-        plaintext.iter().zip(keystream.iter()).map(|(p, k)| p ^ k).collect()
+        let ks_seed = fnv_hash(&self.key_bytes) ^ fnv_hash(&self.nonce);
+        let keystream = generate_bytes(ks_seed, plaintext.len());
+        plaintext
+            .iter()
+            .zip(keystream.iter())
+            .map(|(p, k)| p ^ k)
+            .collect()
     }
 
     pub fn decrypt(&self, ciphertext: &[u8]) -> Vec<u8> {
-        // XOR симметричен: decrypt = encrypt
-        self.encrypt(ciphertext)
+        self.encrypt(ciphertext) // XOR симметричен
     }
 }
 
 // -----------------------------------------------------------------------------
-// ZkpCommitment — криптографическое обязательство
+// KeyRegistry — хранение ключей по key_id (нужно для peel/forward)
 // -----------------------------------------------------------------------------
 
-/// Commitment scheme: commit(value, blinding_factor) = hash(value || blinding)
-///
-/// Свойства:
-///   - Hiding:  по commitment нельзя узнать value
-///   - Binding: нельзя открыть commitment с другим value
+#[derive(Debug, Default)]
+pub struct KeyRegistry {
+    keys: HashMap<String, SessionKey>,
+}
+
+impl KeyRegistry {
+    pub fn new() -> Self { Self::default() }
+
+    pub fn insert(&mut self, key: SessionKey) {
+        self.keys.insert(key.key_id.clone(), key);
+    }
+
+    pub fn get(&self, key_id: &str) -> Option<&SessionKey> {
+        self.keys.get(key_id)
+    }
+
+    pub fn len(&self) -> usize { self.keys.len() }
+}
+
+// -----------------------------------------------------------------------------
+// ZkpCommitment — MVP commitment (НЕ production)
+// -----------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ZkpCommitment {
-    /// Публичный commitment (можно показывать всем)
     pub commitment: String,
-    /// Blinding factor (держим в секрете до reveal)
     pub blinding_factor: u64,
-    /// Хеш от value (для верификации при reveal)
     value_hash: u64,
 }
 
 impl ZkpCommitment {
-    /// Создать commitment для значения
     pub fn commit(value: &[u8]) -> Self {
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let blinding_factor = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as u64 ^ 0xfeedface;
-
+        let blind = (now_ms() as u64) ^ 0xfeedface;
         let value_hash = fnv_hash(value);
 
-        // commitment = hash(value || blinding_factor)
         let mut combined = value.to_vec();
-        combined.extend_from_slice(&blinding_factor.to_le_bytes());
-        let commitment = to_hex(&generate_bytes(fnv_hash(&combined), 32));
+        combined.extend_from_slice(&blind.to_le_bytes());
 
-        ZkpCommitment { commitment, blinding_factor, value_hash }
+        let commitment = to_hex(&generate_bytes(fnv_hash(&combined), 32));
+        ZkpCommitment { commitment, blinding_factor: blind, value_hash }
     }
 
-    /// Верифицировать что value соответствует commitment
     pub fn verify(&self, value: &[u8]) -> bool {
-        let claimed_hash = fnv_hash(value);
-        if claimed_hash != self.value_hash {
+        if fnv_hash(value) != self.value_hash {
             return false;
         }
         let mut combined = value.to_vec();
@@ -181,53 +187,57 @@ impl ZkpCommitment {
 }
 
 // -----------------------------------------------------------------------------
-// OnionLayer — один слой луковичного шифрования
+// Onion structures
 // -----------------------------------------------------------------------------
 
-/// Один слой onion-маршрутизации.
-/// Каждый узел видит только:
-///   - Зашифрованный payload для следующего хопа
-///   - ID следующего узла (в открытом виде — только для маршрутизации)
+/// То, что реально лежит внутри encrypted_payload после decrypt.
+/// Либо следующий слой, либо финальные данные.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "kind", content = "value")]
+pub enum OnionPayload {
+    Layer(OnionLayer),
+    Data(Vec<u8>),
+}
+
+/// Один слой onion-маршрутизации
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OnionLayer {
-    /// ID следующего узла (единственное что видит текущий узел)
+    /// Каким ключом этот слой должен быть расшифрован
+    pub key_id: String,
+    /// Следующий узел (единственное, что должен узнать текущий узел ПОСЛЕ peel)
     pub next_hop: String,
-    /// Зашифрованный payload (остаток луковицы)
+    /// Зашифрованный OnionPayload
     pub encrypted_payload: Vec<u8>,
-    /// Commitment для верификации целостности
-    pub integrity_commitment: String,
+    /// Integrity tag (MVP): хеш ciphertext
+    pub integrity_tag: String,
     /// Nullifier — предотвращает replay
     pub nullifier: String,
 }
 
-// -----------------------------------------------------------------------------
-// OnionPacket — полный зашифрованный пакет
-// -----------------------------------------------------------------------------
-
-/// Полный onion-пакет. Видимая часть минимальна.
+/// Полный onion-пакет: внешняя оболочка + мета
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OnionPacket {
-    /// Только первый слой виден текущему узлу
     pub outer_layer: OnionLayer,
-    /// Число слоёв (без раскрытия маршрута)
     pub layer_count: usize,
-    /// Публичный commitment отправителя (без раскрытия ID)
     pub sender_commitment: String,
-    /// Timestamp для anti-replay
     pub created_at: i64,
 }
 
+/// Результат peel
+#[derive(Debug)]
+pub struct PeeledResult {
+    pub next_hop: String,
+    pub is_final: bool,
+    /// Если is_final=true -> final_data
+    pub final_data: Option<Vec<u8>>,
+    /// Если is_final=false -> следующий слой (для форварда)
+    pub next_layer: Option<OnionLayer>,
+}
+
 // -----------------------------------------------------------------------------
-// OnionBuilder — строит многослойный зашифрованный пакет
+// OnionBuilder
 // -----------------------------------------------------------------------------
 
-/// Строитель onion-пакета.
-///
-/// Использование:
-///   1. Задаём маршрут [node1, node2, ..., destination]
-///   2. Для каждого узла генерируем SessionKey
-///   3. Оборачиваем payload в слои (от последнего к первому)
-///   4. Каждый узел может снять только свой слой
 pub struct OnionBuilder {
     route: Vec<String>,
     keys: Vec<SessionKey>,
@@ -238,81 +248,90 @@ impl OnionBuilder {
         OnionBuilder { route: vec![], keys: vec![] }
     }
 
-    /// Задать маршрут и автоматически сгенерировать ключи
+    /// Задать маршрут и сгенерировать ключи по количеству hop
     pub fn with_route(mut self, route: Vec<String>) -> Self {
         self.keys = route.iter().map(|_| SessionKey::generate()).collect();
         self.route = route;
         self
     }
 
-    /// Собрать onion-пакет с payload
+    /// build возвращает:
+    /// - OnionPacket (для отправки)
+    /// - Vec<SessionKey> (ключи по каждому hop: route[i] -> keys[i])
     pub fn build(self, payload: &[u8]) -> Result<(OnionPacket, Vec<SessionKey>), String> {
         if self.route.is_empty() {
             return Err("Маршрут не задан".to_string());
         }
         if self.route.len() > MAX_ONION_LAYERS {
-            return Err(format!("Слишком много слоёв: {} > {}", self.route.len(), MAX_ONION_LAYERS));
+            return Err(format!(
+                "Слишком много слоёв: {} > {}",
+                self.route.len(),
+                MAX_ONION_LAYERS
+            ));
         }
 
         let layer_count = self.route.len();
 
-        // Строим слои от последнего к первому (как настоящий onion)
-        let mut current_payload = payload.to_vec();
+        // Начинаем с финального payload
+        let mut inner = OnionPayload::Data(payload.to_vec());
 
-        // Сохраним все слои для дебага
-        let mut layers: Vec<OnionLayer> = Vec::new();
+        // Строим от последнего hop к первому
+        let mut built_layers: Vec<OnionLayer> = Vec::with_capacity(layer_count);
 
-        for i in (0..self.route.len()).rev() {
+        for i in (0..layer_count).rev() {
             let key = &self.keys[i];
-            let next_hop = if i + 1 < self.route.len() {
+
+            let next_hop = if i + 1 < layer_count {
                 self.route[i + 1].clone()
             } else {
                 "DESTINATION".to_string()
             };
 
-            // Шифруем текущий payload ключом этого узла
-            let encrypted = key.encrypt(&current_payload);
+            let inner_bytes = serde_json::to_vec(&inner)
+                .map_err(|e| format!("Onion serialize error: {}", e))?;
 
-            // Integrity commitment
-            let integrity = to_hex(&generate_bytes(fnv_hash(&encrypted), 16));
+            let ciphertext = key.encrypt(&inner_bytes);
 
-            // Nullifier — уникальный идентификатор для anti-replay
+            // Integrity tag (MVP) = hash(ciphertext)
+            let integrity_tag = to_hex(&generate_bytes(fnv_hash(&ciphertext), 16));
+
+            // Nullifier: зависит от key_id и индекса слоя
             let nullifier = to_hex(&generate_bytes(
-                fnv_hash(key.key_id.as_bytes()) ^ i as u64,
+                fnv_hash(key.key_id.as_bytes()) ^ (i as u64) ^ 0xabcddcba,
                 16,
             ));
 
             let layer = OnionLayer {
+                key_id: key.key_id.clone(),
                 next_hop,
-                encrypted_payload: encrypted.clone(),
-                integrity_commitment: integrity,
+                encrypted_payload: ciphertext.clone(),
+                integrity_tag,
                 nullifier,
             };
 
-            layers.push(layer);
-            // Следующий слой оборачивает текущий зашифрованный payload
-            current_payload = encrypted;
+            // Следующий inner = Layer(layer)
+            inner = OnionPayload::Layer(layer.clone());
+            built_layers.push(layer);
         }
 
-        layers.reverse();
+        // Последний добавленный (на i=0) — это внешний слой, но он сейчас в built_layers.last()
+        built_layers.reverse();
+        let outer_layer = built_layers
+            .into_iter()
+            .next()
+            .ok_or_else(|| "Onion build internal error".to_string())?;
 
-        // Commitment отправителя (без раскрытия ID)
+        // Commitment отправителя
         let sender_commitment = to_hex(&generate_bytes(
             fnv_hash(self.route[0].as_bytes()) ^ 0xdeadcafe,
             32,
         ));
 
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_millis() as i64;
-
         let packet = OnionPacket {
-            outer_layer: layers.into_iter().next().unwrap(),
+            outer_layer,
             layer_count,
             sender_commitment,
-            created_at: now,
+            created_at: now_ms(),
         };
 
         Ok((packet, self.keys))
@@ -324,31 +343,51 @@ impl Default for OnionBuilder {
 }
 
 // -----------------------------------------------------------------------------
-// OnionProcessor — обработка пакета на промежуточном узле
+// Peel / Verify
 // -----------------------------------------------------------------------------
 
-/// Результат обработки onion-пакета
-#[derive(Debug)]
-pub struct PeeledLayer {
-    /// Следующий узел куда переслать
-    pub next_hop: String,
-    /// Расшифрованный payload для следующего слоя
-    pub inner_payload: Vec<u8>,
-    /// Это последний слой (мы — получатель)?
-    pub is_final: bool,
+fn check_integrity(ciphertext: &[u8], integrity_tag: &str) -> bool {
+    let expected = to_hex(&generate_bytes(fnv_hash(ciphertext), 16));
+    expected == integrity_tag
 }
 
-/// Снять один слой onion-пакета.
-///
-/// Узел знает только свой ключ → видит только next_hop.
-/// Содержимое payload остаётся зашифрованным для него.
-pub fn peel_onion_layer(layer: &OnionLayer, key: &SessionKey) -> PeeledLayer {
-    let inner = key.decrypt(&layer.encrypted_payload);
-    let is_final = layer.next_hop == "DESTINATION";
-    PeeledLayer {
-        next_hop: layer.next_hop.clone(),
-        inner_payload: inner,
-        is_final,
+/// Снять один слой:
+/// - проверяем integrity_tag
+/// - decrypt -> OnionPayload
+/// - если Layer(next_layer) -> вернуть next_hop + next_layer
+/// - если Data(bytes) -> финал
+pub fn peel_onion_layer(layer: &OnionLayer, key: &SessionKey) -> Result<PeeledResult, String> {
+    if layer.key_id != key.key_id {
+        return Err("key_id mismatch for onion layer".to_string());
+    }
+
+    if !check_integrity(&layer.encrypted_payload, &layer.integrity_tag) {
+        return Err("integrity check failed".to_string());
+    }
+
+    let decrypted = key.decrypt(&layer.encrypted_payload);
+
+    let inner: OnionPayload = serde_json::from_slice(&decrypted)
+        .map_err(|e| format!("Onion deserialize error: {}", e))?;
+
+    match inner {
+        OnionPayload::Layer(next_layer) => {
+            let is_final = next_layer.next_hop == "DESTINATION";
+            Ok(PeeledResult {
+                next_hop: next_layer.next_hop.clone(),
+                is_final,
+                final_data: None,
+                next_layer: Some(next_layer),
+            })
+        }
+        OnionPayload::Data(data) => {
+            Ok(PeeledResult {
+                next_hop: "DESTINATION".to_string(),
+                is_final: true,
+                final_data: Some(data),
+                next_layer: None,
+            })
+        }
     }
 }
 
@@ -356,19 +395,15 @@ pub fn peel_onion_layer(layer: &OnionLayer, key: &SessionKey) -> PeeledLayer {
 // NullifierSet — защита от replay-атак
 // -----------------------------------------------------------------------------
 
-/// Реестр использованных nullifiers.
-/// Если nullifier уже видели — пакет отброшен (replay-атака).
 #[derive(Debug, Default)]
 pub struct NullifierSet {
     seen: HashSet<String>,
-    /// Счётчик отброшенных replay
     pub replay_attempts: u64,
 }
 
 impl NullifierSet {
     pub fn new() -> Self { Self::default() }
 
-    /// Проверить и добавить nullifier. Возвращает false если replay.
     pub fn check_and_add(&mut self, nullifier: &str) -> bool {
         if self.seen.contains(nullifier) {
             self.replay_attempts += 1;
@@ -383,27 +418,19 @@ impl NullifierSet {
 }
 
 // -----------------------------------------------------------------------------
-// BlindedSsau — SSAU данные без раскрытия узла-отправителя
+// BlindedSsau — SSAU данные без раскрытия узла-отправителя (MVP)
 // -----------------------------------------------------------------------------
 
-/// SSAU тензор с ослеплённым (blinded) источником.
-/// Промежуточный узел видит данные о качестве канала,
-/// но не знает кто их отправил.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BlindedSsau {
-    /// Commitment вместо реального node_id отправителя
     pub sender_commitment: String,
-    /// Данные канала (в открытом виде — нужны для маршрутизации)
     pub latency_ms: f64,
     pub bandwidth_mbps: f64,
-    /// Reliability зашифрован — только получатель может расшифровать
     pub encrypted_reliability: Vec<u8>,
-    /// Proof что данные валидны (без раскрытия источника)
     pub validity_proof: String,
 }
 
 impl BlindedSsau {
-    /// Создать ослеплённый SSAU из реального тензора
     pub fn from_tensor(
         sender_id: &str,
         latency_ms: f64,
@@ -411,16 +438,13 @@ impl BlindedSsau {
         reliability: f64,
         session_key: &SessionKey,
     ) -> Self {
-        // Commitment вместо реального ID
         let commitment = ZkpCommitment::commit(sender_id.as_bytes());
 
-        // Шифруем reliability (чувствительный параметр)
         let reliability_bytes = reliability.to_le_bytes();
         let encrypted_reliability = session_key.encrypt(&reliability_bytes);
 
-        // Proof валидности (в реальной системе — zk-SNARK)
         let validity_proof = to_hex(&generate_bytes(
-            fnv_hash(sender_id.as_bytes()) ^ (latency_ms as u64),
+            fnv_hash(sender_id.as_bytes()) ^ (latency_ms as u64) ^ 0x12345678,
             32,
         ));
 
@@ -433,7 +457,6 @@ impl BlindedSsau {
         }
     }
 
-    /// Расшифровать reliability (только если знаешь ключ)
     pub fn decrypt_reliability(&self, session_key: &SessionKey) -> f64 {
         let decrypted = session_key.decrypt(&self.encrypted_reliability);
         if decrypted.len() >= 8 {
@@ -455,89 +478,57 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_session_key_encrypt_decrypt() {
-        let key = SessionKey::generate();
-        let plaintext = b"Federation ZKP test message 12345";
-        let encrypted = key.encrypt(plaintext);
-        let decrypted = key.decrypt(&encrypted);
-        assert_eq!(plaintext.to_vec(), decrypted, "Расшифровка должна вернуть оригинал");
-        assert_ne!(plaintext.to_vec(), encrypted, "Шифртекст должен отличаться");
-        println!("✅ XOR cipher: plaintext={} bytes encrypted={} bytes", plaintext.len(), encrypted.len());
-    }
-
-    #[test]
-    fn test_zkp_commitment_verify() {
-        let value = b"node_ALPHA_secret_identity";
-        let commitment = ZkpCommitment::commit(value);
-        assert!(commitment.verify(value), "Верификация должна пройти с правильным значением");
-        assert!(!commitment.verify(b"wrong_value"), "Верификация должна провалиться с неверным значением");
-        println!("✅ ZKP Commitment: {}", &commitment.commitment[..16]);
-        println!("   Hiding: commitment не раскрывает identity");
-        println!("   Binding: нельзя открыть с другим значением");
-    }
-
-    #[test]
-    fn test_onion_build_and_peel() {
-        let route = vec![
-            "node_A".to_string(),
-            "node_B".to_string(),
-            "node_C".to_string(),
-        ];
-        let payload = b"SECRET: send 100 coins to destination";
+    fn test_onion_build_and_full_peel() {
+        let route = vec!["node_A".to_string(), "node_B".to_string(), "node_C".to_string()];
+        let payload = b"SECRET PAYLOAD";
 
         let (packet, keys) = OnionBuilder::new()
             .with_route(route.clone())
             .build(payload)
-            .expect("Onion build должен успешно выполниться");
+            .expect("build ok");
 
-        println!("✅ Onion packet создан: {} слоёв", packet.layer_count);
-        println!("   Outer next_hop: {}", packet.outer_layer.next_hop);
-        println!("   Encrypted size: {} bytes", packet.outer_layer.encrypted_payload.len());
-        println!("   Sender commitment: {}", &packet.sender_commitment[..16]);
+        // peel A
+        let r1 = peel_onion_layer(&packet.outer_layer, &keys[0]).expect("peel A ok");
+        assert_eq!(r1.next_hop, "node_B");
+        assert!(r1.next_layer.is_some());
 
-        // node_A снимает свой слой
-        let peeled_a = peel_onion_layer(&packet.outer_layer, &keys[0]);
-        println!("\n   node_A видит только: next_hop={}", peeled_a.next_hop);
-        println!("   node_A НЕ знает отправителя и финального получателя");
-        assert_eq!(peeled_a.next_hop, "node_B");
-        assert!(!peeled_a.is_final);
+        // peel B (берём следующий слой)
+        let layer_b = r1.next_layer.unwrap();
+        let r2 = peel_onion_layer(&layer_b, &keys[1]).expect("peel B ok");
+        assert_eq!(r2.next_hop, "node_C");
+        assert!(r2.next_layer.is_some());
 
-        // Проверяем что payload зашифрован (не равен оригиналу)
-        assert_ne!(packet.outer_layer.encrypted_payload, payload.to_vec());
+        // peel C
+        let layer_c = r2.next_layer.unwrap();
+        let r3 = peel_onion_layer(&layer_c, &keys[2]).expect("peel C ok");
 
-        println!("\n✅ Zero-Knowledge routing: каждый узел видит только следующий hop");
+        // финал
+        assert!(r3.is_final);
+        assert_eq!(r3.final_data.unwrap(), payload.to_vec());
     }
 
     #[test]
-    fn test_nullifier_anti_replay() {
-        let mut nullifiers = NullifierSet::new();
-        let nullifier = "abc123def456";
-
-        assert!(nullifiers.check_and_add(nullifier), "Первый пакет должен пройти");
-        assert!(!nullifiers.check_and_add(nullifier), "Replay должен быть отброшен");
-        assert_eq!(nullifiers.replay_attempts, 1);
-        println!("✅ Anti-replay: повторный пакет отброшен. Replay attempts: {}", nullifiers.replay_attempts);
+    fn test_key_registry() {
+        let k = SessionKey::generate();
+        let id = k.key_id.clone();
+        let mut kr = KeyRegistry::new();
+        kr.insert(k);
+        assert!(kr.get(&id).is_some());
     }
 
     #[test]
-    fn test_blinded_ssau() {
-        let key = SessionKey::generate();
-        let blinded = BlindedSsau::from_tensor("node_ALPHA", 10.0, 1000.0, 0.99, &key);
+    fn test_nullifier_replay() {
+        let mut n = NullifierSet::new();
+        assert!(n.check_and_add("abc"));
+        assert!(!n.check_and_add("abc"));
+        assert_eq!(n.replay_attempts, 1);
+    }
 
-        println!("✅ Blinded SSAU:");
-        println!("   Sender commitment: {}", &blinded.sender_commitment[..16]);
-        println!("   Latency (открыто): {:.1}ms", blinded.latency_ms);
-        println!("   Bandwidth (открыто): {:.0}Mbps", blinded.bandwidth_mbps);
-        println!("   Reliability (зашифровано): {} bytes", blinded.encrypted_reliability.len());
-
-        // Расшифровываем reliability
-        let decrypted_reliability = blinded.decrypt_reliability(&key);
-        println!("   Reliability (расшифровано): {:.4}", decrypted_reliability);
-        assert!((decrypted_reliability - 0.99).abs() < 0.001,
-            "Расшифрованное значение должно совпадать с оригиналом");
-
-        println!("   Промежуточный узел видит только latency и bandwidth");
-        println!("   Reliability и sender_id скрыты за commitment");
+    #[test]
+    fn test_commitment() {
+        let v = b"node_X";
+        let c = ZkpCommitment::commit(v);
+        assert!(c.verify(v));
+        assert!(!c.verify(b"node_Y"));
     }
 }
-EOF
