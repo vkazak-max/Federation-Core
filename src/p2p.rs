@@ -53,7 +53,6 @@ impl PeerConnection {
     pub async fn send_packet(&mut self, packet: &FederationPacket) -> Result<(), String> {
         let data = serialize_packet(packet).map_err(|e| e.to_string())?;
         let len = data.len() as u32;
-
         if len as usize > MAX_PACKET_SIZE {
             return Err(format!("Packet too large: {}", len));
         }
@@ -125,7 +124,7 @@ impl NodeConfig {
 pub struct FederationNode {
     pub config: NodeConfig,
 
-    /// Важно: храним Arc<Mutex<PeerConnection>> чтобы НЕ держать RWLock во время IO-await
+    /// IMPORTANT: Arc<Mutex<PeerConnection>> чтобы overlay.rs мог лочить коннекты и слать пакеты.
     pub connections: Arc<RwLock<HashMap<String, Arc<Mutex<PeerConnection>>>>>,
 
     pub ssau_table: Arc<RwLock<HashMap<String, SsauTensor>>>,
@@ -161,11 +160,10 @@ impl FederationNode {
             match listener.accept().await {
                 Ok((stream, peer_addr)) => {
                     log::info!("📡 Incoming connection from {}", peer_addr);
-
                     let node_clone = Arc::clone(&self);
                     tokio::spawn(async move {
                         if let Err(e) = node_clone.handle_incoming(stream, peer_addr).await {
-                            log::error!("❌ Incoming connection error {}: {}", peer_addr, e);
+                            log::error!("❌ Connection error {}: {}", peer_addr, e);
                         }
                     });
                 }
@@ -178,15 +176,8 @@ impl FederationNode {
 
     async fn handle_incoming(self: Arc<Self>, stream: TcpStream, peer_addr: SocketAddr) -> Result<(), String> {
         let peer_addr_str = peer_addr.to_string();
+        let mut conn = PeerConnection::new(format!("unknown_{}", peer_addr_str), peer_addr, stream);
 
-        // Временный peer_id до handshake
-        let mut conn = PeerConnection::new(
-            format!("unknown_{}", peer_addr_str),
-            peer_addr,
-            stream,
-        );
-
-        // Первый пакет — обязательно Handshake
         let packet = tokio::time::timeout(
             Duration::from_secs(HANDSHAKE_TIMEOUT_SECS),
             conn.recv_packet(),
@@ -217,7 +208,6 @@ impl FederationNode {
                 }
 
                 let session_id = uuid::Uuid::new_v4().to_string();
-
                 let ack = PacketBuilder::new(&self.config.node_id)
                     .to(&h.node_id)
                     .build(FederationMessage::HandshakeAck(HandshakeAckPayload {
@@ -233,14 +223,17 @@ impl FederationNode {
                 conn.peer_id = h.node_id.clone();
                 conn.state = ConnectionState::Active;
 
+                log::info!("✅ Handshake complete! Peer [{}] active.", conn.peer_id);
+
                 let peer_id = conn.peer_id.clone();
-                log::info!("✅ Handshake complete! Peer [{}] active.", peer_id);
-
-                // Вставляем в таблицу соединений как Arc<Mutex<...>>
                 let conn_arc = Arc::new(Mutex::new(conn));
-                self.connections.write().await.insert(peer_id.clone(), conn_arc);
 
-                // Запускаем loop в отдельной таске
+                self.connections
+                    .write()
+                    .await
+                    .insert(peer_id.clone(), Arc::clone(&conn_arc));
+
+                // Запускаем message loop для этого peer
                 let node = Arc::clone(&self);
                 tokio::spawn(async move {
                     node.peer_message_loop(peer_id).await;
@@ -266,12 +259,11 @@ impl FederationNode {
         let addr: SocketAddr = stream.peer_addr().unwrap();
         let mut conn = PeerConnection::new(format!("pending_{}", peer_addr), addr, stream);
 
-        // Новый network.rs: handshake без recipient_id (None) и без their_node_id
-        let known = self.connections.read().await.len() as u32;
+        // UPDATED: create_handshake_packet(our_node_id, public_key, known_peers)
         let handshake = crate::network::create_handshake_packet(
             &self.config.node_id,
             &self.config.public_key,
-            known,
+            self.connections.read().await.len() as u32,
         );
 
         conn.send_packet(&handshake).await?;
@@ -305,14 +297,13 @@ impl FederationNode {
                 conn.state = ConnectionState::Active;
 
                 let conn_arc = Arc::new(Mutex::new(conn));
-                self.connections.write().await.insert(peer_id.clone(), conn_arc);
+                self.connections
+                    .write()
+                    .await
+                    .insert(peer_id.clone(), Arc::clone(&conn_arc));
 
-                // loop
                 let node = Arc::clone(&self);
-                let pid = peer_id.clone();
-                tokio::spawn(async move {
-                    node.peer_message_loop(pid).await;
-                });
+                tokio::spawn(async move { node.peer_message_loop(peer_id).await; });
 
                 Ok(peer_id)
             }
@@ -328,18 +319,15 @@ impl FederationNode {
         );
 
         loop {
-            // Берём Arc на соединение (без удержания lock во время IO)
             let conn_arc = {
                 let conns = self.connections.read().await;
                 conns.get(&peer_id).cloned()
             };
 
-            let conn_arc = match conn_arc {
-                Some(c) => c,
-                None => break,
+            let Some(conn_arc) = conn_arc else {
+                break;
             };
 
-            // IO под Mutex конкретного соединения
             let packet = {
                 let mut conn = conn_arc.lock().await;
                 conn.recv_packet().await
@@ -389,8 +377,6 @@ impl FederationNode {
                     update.tensors.len()
                 );
 
-                let now = chrono::Utc::now().timestamp_millis();
-
                 let mut table = self.ssau_table.write().await;
                 for t_msg in &update.tensors {
                     let key = format!("{}→{}", t_msg.from_node, t_msg.to_node);
@@ -407,11 +393,88 @@ impl FederationNode {
                         bandwidth: t_msg.bandwidth_mbps,
                         reliability: t_msg.reliability,
                         energy_cost: t_msg.energy_cost,
-                        updated_at: now,
+                        updated_at: 0,
                         version: t_msg.version,
                     };
 
                     table.insert(key, tensor);
+                }
+            }
+
+            FederationMessage::NodeDiscovered(info) => {
+                // Пока просто лог. Хранилище known_nodes живёт в overlay.rs
+                log::info!(
+                    "🧭 Node discovered: id={} addr={} trust={:.2}",
+                    info.node_id,
+                    info.address,
+                    info.trust_weight
+                );
+            }
+
+            // NEW: OnionRelay
+            FederationMessage::OnionRelay(relay) => {
+                // MVP-обработка:
+                // - если TTL закончился — дроп
+                // - если есть прямое соединение с relay.next_hop — форвардим как есть, уменьшая hop_ttl и header.ttl
+                // NOTE: полноценный onion-peel (вычисление следующего hop) добавим позже через session keys.
+                if relay.hop_ttl == 0 || packet.header.ttl == 0 {
+                    log::warn!("🧅 OnionRelay dropped: TTL=0 relay_id={}", relay.relay_id);
+                    return;
+                }
+
+                if relay.next_hop == self.config.node_id {
+                    log::info!(
+                        "🧅 OnionRelay reached next_hop=self (relay_id={}, origin={}) — дальнейшая обработка TBD",
+                        relay.relay_id,
+                        relay.origin_node_id
+                    );
+                    return;
+                }
+
+                // попробуем форвардить на next_hop если это наш прямой peer
+                let conn_arc = {
+                    let conns = self.connections.read().await;
+                    conns.get(&relay.next_hop).cloned()
+                };
+
+                if let Some(conn_arc) = conn_arc {
+                    let mut forward_packet = packet.clone();
+                    forward_packet.header.ttl = forward_packet.header.ttl.saturating_sub(1);
+
+                    // уменьшаем hop_ttl внутри payload
+                    if let FederationMessage::OnionRelay(mut payload) = forward_packet.message.clone() {
+                        payload.hop_ttl = payload.hop_ttl.saturating_sub(1);
+                        forward_packet.message = FederationMessage::OnionRelay(payload);
+                    }
+
+                    // адресуем пакет
+                    forward_packet.header.recipient_id = Some(relay.next_hop.clone());
+
+                    let res = {
+                        let mut conn = conn_arc.lock().await;
+                        conn.send_packet(&forward_packet).await
+                    };
+
+                    match res {
+                        Ok(_) => log::info!(
+                            "🧅 OnionRelay forwarded: relay_id={} -> {} (ttl_left={})",
+                            relay.relay_id,
+                            relay.next_hop,
+                            forward_packet.header.ttl
+                        ),
+                        Err(e) => log::warn!(
+                            "🧅 OnionRelay forward failed: relay_id={} -> {} err={}",
+                            relay.relay_id,
+                            relay.next_hop,
+                            e
+                        ),
+                    }
+                } else {
+                    log::warn!(
+                        "🧅 OnionRelay cannot forward: no direct peer next_hop={} relay_id={}",
+                        relay.next_hop,
+                        relay.relay_id
+                    );
                 }
             }
 
@@ -420,9 +483,7 @@ impl FederationNode {
                 self.connections.write().await.remove(node_id);
             }
 
-            _ => {
-                // MVP: можно логировать остальные типы при необходимости
-            }
+            _ => {}
         }
     }
 
@@ -436,32 +497,27 @@ impl FederationNode {
             let uptime = self.started_at.elapsed().as_secs();
             let peer_count = self.connections.read().await.len();
 
-            let hb_packet = PacketBuilder::new(&self.config.node_id).build(FederationMessage::Heartbeat(
-                crate::network::HeartbeatPayload {
+            let hb = PacketBuilder::new(&self.config.node_id).build(
+                FederationMessage::Heartbeat(crate::network::HeartbeatPayload {
                     node_id: self.config.node_id.clone(),
                     timestamp: chrono::Utc::now().timestamp_millis(),
                     uptime_seconds: uptime,
                     load_factor: peer_count as f64 / self.config.max_peers as f64,
-                },
-            ));
+                }),
+            );
 
-            // Снимок peer_ids
-            let peer_ids: Vec<String> = {
+            let peers_snapshot: Vec<(String, Arc<Mutex<PeerConnection>>)> = {
                 let conns = self.connections.read().await;
-                conns.keys().cloned().collect()
+                conns.iter().map(|(id, c)| (id.clone(), Arc::clone(c))).collect()
             };
 
-            for peer_id in peer_ids {
-                let conn_arc = {
-                    let conns = self.connections.read().await;
-                    conns.get(&peer_id).cloned()
-                };
-
-                if let Some(conn_arc) = conn_arc {
+            for (peer_id, conn_arc) in peers_snapshot {
+                let res = {
                     let mut conn = conn_arc.lock().await;
-                    if let Err(e) = conn.send_packet(&hb_packet).await {
-                        log::warn!("Heartbeat failed for {}: {}", peer_id, e);
-                    }
+                    conn.send_packet(&hb).await
+                };
+                if let Err(e) = res {
+                    log::warn!("Heartbeat failed for {}: {}", peer_id, e);
                 }
             }
         }
