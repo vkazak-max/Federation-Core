@@ -1,0 +1,3479 @@
+    Checking libc v0.2.182
+    Checking cfg-if v1.0.4
+    Checking memchr v2.8.0
+    Checking num-traits v0.2.19
+    Checking scopeguard v1.2.0
+    Checking smallvec v1.15.1
+    Checking parking_lot_core v0.9.12
+    Checking lock_api v0.4.14
+    Checking getrandom v0.2.17
+    Checking errno v0.3.14
+    Checking serde_core v1.0.228
+    Checking zerocopy v0.8.39
+    Checking aho-corasick v1.1.4
+    Checking regex-syntax v0.8.9
+    Checking regex-automata v0.4.14
+    Checking ppv-lite86 v0.2.21
+    Checking signal-hook-registry v1.4.8
+    Checking rand_core v0.6.4
+    Checking parking_lot v0.12.5
+    Checking socket2 v0.6.2
+    Checking mio v1.1.1
+    Checking pin-project-lite v0.2.16
+    Checking rawpointer v0.2.1
+    Checking bytes v1.11.1
+    Checking regex v1.12.3
+    Checking tokio v1.49.0
+    Checking matrixmultiply v0.3.10
+    Checking serde v1.0.228
+    Checking rand_chacha v0.3.1
+    Checking getrandom v0.3.4
+    Checking zmij v1.0.21
+    Checking num-complex v0.4.6
+    Checking num-integer v0.1.46
+    Checking is-terminal v0.4.17
+    Checking iana-time-zone v0.1.65
+    Checking humantime v2.3.0
+    Checking futures-sink v0.3.31
+    Checking termcolor v1.4.1
+    Checking log v0.4.29
+    Checking itoa v1.0.17
+    Checking futures-core v0.3.31
+    Checking serde_json v1.0.149
+    Checking env_logger v0.10.2
+    Checking chrono v0.4.43
+    Checking tokio-util v0.7.18
+    Checking ndarray v0.15.6
+    Checking uuid v1.20.0
+    Checking rand v0.8.5
+    Checking federation-core v0.1.0-alpha (/home/nexus/federation-core)
+warning: unused import: `std::collections::HashMap`
+  --> src/satellite_pulse.rs:21:5
+   |
+21 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `LEARNING_RATE`, `NeuralWeights`, and `OUTPUT_SIZE`
+  --> src/federated.rs:14:26
+   |
+14 | use crate::neural_node::{NeuralWeights, NeuralInput, NeuralTarget, NeuralState,
+   |                          ^^^^^^^^^^^^^
+15 |     INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE, LEARNING_RATE};
+   |                              ^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> src/mutation.rs:15:5
+   |
+15 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `FederationMessage`, `NodeCapabilities`, and `PacketBuilder`
+  --> src/overlay.rs:16:22
+   |
+16 | use crate::network::{FederationMessage, NodeInfo, NodeCapabilities, PacketBuilder};
+   |                      ^^^^^^^^^^^^^^^^^            ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+warning: unused import: `SessionKey`
+  --> src/overlay.rs:20:46
+   |
+20 | use crate::zkp::{OnionBuilder, NullifierSet, SessionKey};
+   |                                              ^^^^^^^^^^
+
+warning: unused import: `crate::swarm::ExperienceType`
+ --> src/shard.rs:1:5
+  |
+1 | use crate::swarm::ExperienceType;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::tensor::SsauTensor`
+ --> src/swarm.rs:1:5
+  |
+1 | use crate::tensor::SsauTensor;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::routing::UserPriorities`
+ --> src/swarm.rs:2:5
+  |
+2 | use crate::routing::UserPriorities;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Duration`
+  --> src/transport.rs:17:17
+   |
+17 | use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+   |                 ^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> src/veil_breaker.rs:7:5
+  |
+7 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `NeuralState`
+  --> src/main.rs:91:71
+   |
+91 |     use crate::neural_node::{NeuralRouter, NeuralInput, NeuralTarget, NeuralState};
+   |                                                                       ^^^^^^^^^^^
+
+warning: unused import: `NeuralTarget`
+   --> src/main.rs:145:56
+    |
+145 |     use crate::neural_node::{NeuralState, NeuralInput, NeuralTarget, NeuralTactic};
+    |                                                        ^^^^^^^^^^^^
+
+warning: unused imports: `MutationEngine` and `MutationStrategy`
+   --> src/main.rs:146:27
+    |
+146 |     use crate::mutation::{MutationEngine, MutationStrategy};
+    |                           ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AikiEthicsRule` and `ProportionalityVerdict`
+   --> src/main.rs:189:52
+    |
+189 |     use crate::ethics::{EthicsLayer, EthicsAction, AikiEthicsRule, ProportionalityVerdict};
+    |                                                    ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `TransportScheduler`
+   --> src/main.rs:213:28
+    |
+213 |     use crate::transport::{TransportScheduler, TransportChannel, MicroClock};
+    |                            ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `VaultTier`
+   --> src/main.rs:493:51
+    |
+493 |     use crate::vault::{CryptoVault, ShamirScheme, VaultTier};
+    |                                                   ^^^^^^^^^
+
+warning: unused import: `PoolType`
+   --> src/main.rs:797:56
+    |
+797 |     use crate::pools::{SwarmTreasury, InsuranceReason, PoolType};
+    |                                                        ^^^^^^^^
+
+warning: unused import: `AiVerdict`
+    --> src/main.rs:1437:74
+     |
+1437 |     use crate::proposal_engine::{IdeaLab, HumanProposal, ProposalDomain, AiVerdict};
+     |                                                                          ^^^^^^^^^
+
+warning: unused imports: `CreditLedger` and `HardwareAge`
+    --> src/main.rs:1586:51
+     |
+1586 |     use crate::credits::{EcoProfile, UpgradeFund, CreditLedger, HardwareAge};
+     |                                                   ^^^^^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `ReputationRegistry`
+    --> src/main.rs:1906:41
+     |
+1906 |     use crate::reputation::{TrustGraph, ReputationRegistry};
+     |                                         ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Poly1305`
+    --> src/main.rs:2124:53
+     |
+2124 |     use crate::chacha::{ChaCha20, ChaCha20Poly1305, Poly1305, X25519, FederationCipher};
+     |                                                     ^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> src/dashboard.rs:15:5
+   |
+15 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> src/main.rs:148:9
+    |
+148 |     let mut state = NeuralState::new("nexus-core-01");
+    |         ----^^^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `data`
+   --> src/robot_mesh.rs:410:32
+    |
+410 | ...                   data: &[u8]) -> MeshRouteResult {
+    |                       ^^^^ help: if this is intentional, prefix it with an underscore: `_data`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/vault.rs:180:13
+    |
+180 |         let mut coeffs: Vec<Vec<u8>> = (0..k-1).map(|_| {
+    |             ----^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: unused variable: `ratio`
+   --> src/ethics.rs:356:57
+    |
+356 |                     ProportionalityVerdict::Justified { ratio, .. } => {
+    |                                                         ^^^^^ help: try ignoring the field: `ratio: _`
+
+warning: unused variable: `best_score`
+  --> src/federated.rs:75:35
+   |
+75 |         if let Some((best_tactic, best_score)) = scores.iter()
+   |                                   ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_best_score`
+
+warning: unused variable: `exhaust_factor`
+   --> src/mutation.rs:517:48
+    |
+517 |             MutationStrategy::AikiReflection { exhaust_factor, .. } => {
+    |                                                ^^^^^^^^^^^^^^ help: try ignoring the field: `exhaust_factor: _`
+
+warning: unused variable: `norm_slope`
+   --> src/neural_node.rs:228:13
+    |
+228 |         let norm_slope = (slope / 50.0).clamp(-1.0, 1.0);
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_norm_slope`
+
+warning: unused variable: `target`
+   --> src/oracle.rs:230:50
+    |
+230 |             OracleRequestType::CensorshipProbe { target, region } => {
+    |                                                  ^^^^^^ help: try ignoring the field: `target: _`
+
+warning: unused variable: `domain`
+   --> src/oracle.rs:234:44
+    |
+234 |             OracleRequestType::DnsLookup { domain, .. } => {
+    |                                            ^^^^^^ help: try ignoring the field: `domain: _`
+
+warning: unused variable: `halving_triggered`
+   --> src/mint.rs:200:13
+    |
+200 |         let halving_triggered = self.halving.update(self.total_bypasses);
+    |             ^^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_halving_triggered`
+
+warning: unused variable: `bypasses_before`
+   --> src/mint.rs:231:13
+    |
+231 |         let bypasses_before = self.total_bypasses;
+    |             ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bypasses_before`
+
+warning: unused variable: `target`
+  --> src/main.rs:96:9
+   |
+96 |     let target = NeuralTarget::success_route(0.9);
+   |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_target`
+
+warning: unused variable: `cap`
+   --> src/main.rs:704:13
+    |
+704 |         let cap = NodeCapacity_from(&hw);
+    |             ^^^ help: if this is intentional, prefix it with an underscore: `_cap`
+
+warning: constant `QUORUM_THRESHOLD` is never used
+ --> src/consensus.rs:7:7
+  |
+7 | const QUORUM_THRESHOLD: f64 = 2.0 / 3.0;
+  |       ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `ROUND_TIMEOUT_TICKS` is never used
+ --> src/consensus.rs:8:7
+  |
+8 | const ROUND_TIMEOUT_TICKS: u64 = 10;
+  |       ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `BYZANTINE_DELAY_FRACTION` is never used
+ --> src/consensus.rs:9:7
+  |
+9 | const BYZANTINE_DELAY_FRACTION: f64 = 0.95;
+  |       ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `NodeTier` is never used
+  --> src/consensus.rs:12:10
+   |
+12 | pub enum NodeTier { Ghost, Droid, Sentinel, Citadel }
+   |          ^^^^^^^^
+
+warning: enum `FaultMode` is never used
+  --> src/consensus.rs:15:10
+   |
+15 | pub enum FaultMode { Honest, Crash, ByzantineLite, Byzantine }
+   |          ^^^^^^^^^
+
+warning: struct `Block` is never constructed
+  --> src/consensus.rs:18:12
+   |
+18 | pub struct Block {
+   |            ^^^^^
+
+warning: associated function `new` is never used
+  --> src/consensus.rs:27:12
+   |
+26 | impl Block {
+   | ---------- associated function in this implementation
+27 |     pub fn new(height: u64, round: u32, proposer_id: usize, payload: Vec<u8>) -> Self {
+   |            ^^^
+
+warning: enum `ConsensusPhase` is never used
+  --> src/consensus.rs:38:10
+   |
+38 | pub enum ConsensusPhase { Propose, Prevote, Precommit, Finalized }
+   |          ^^^^^^^^^^^^^^
+
+warning: struct `Vote` is never constructed
+  --> src/consensus.rs:41:12
+   |
+41 | pub struct Vote {
+   |            ^^^^
+
+warning: struct `ConsensusNode` is never constructed
+  --> src/consensus.rs:52:12
+   |
+52 | pub struct ConsensusNode {
+   |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `vote_weight`, `can_lead`, and `byzantine_equivocate` are never used
+  --> src/consensus.rs:68:12
+   |
+67 | impl ConsensusNode {
+   | ------------------ associated items in this implementation
+68 |     pub fn new(id: usize, tier: NodeTier, trust_score: f64, stake: f64, fault_mode: FaultMode) -> Self {
+   |            ^^^
+...
+78 |     pub fn vote_weight(&self) -> f64 {
+   |            ^^^^^^^^^^^
+...
+82 |     pub fn can_lead(&self) -> bool {
+   |            ^^^^^^^^
+...
+86 |     fn byzantine_equivocate(
+   |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `RoundResult` is never used
+   --> src/consensus.rs:101:10
+    |
+101 | pub enum RoundResult {
+    |          ^^^^^^^^^^^
+
+warning: struct `ConsensusLog` is never constructed
+   --> src/consensus.rs:109:12
+    |
+109 | pub struct ConsensusLog {
+    |            ^^^^^^^^^^^^
+
+warning: struct `ConsensusEngine` is never constructed
+   --> src/consensus.rs:122:12
+    |
+122 | pub struct ConsensusEngine {
+    |            ^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/consensus.rs:132:12
+    |
+131 | impl ConsensusEngine {
+    | -------------------- associated items in this implementation
+132 |     pub fn new(nodes: Vec<ConsensusNode>, f: usize) -> Self {
+    |            ^^^
+...
+138 |     pub fn total_weight(&self) -> f64 {
+    |            ^^^^^^^^^^^^
+...
+142 |     pub fn total_honest_weight(&self) -> f64 {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+147 |     pub fn is_healthy(&self) -> bool {
+    |            ^^^^^^^^^^
+...
+151 |     pub fn byzantine_weight_fraction(&self) -> f64 {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+158 |     pub fn elect_leader(&self) -> usize {
+    |            ^^^^^^^^^^^^
+...
+166 |     pub fn run_round(&mut self, height: u64, payload: Vec<u8>) -> RoundResult {
+    |            ^^^^^^^^^
+...
+280 |     pub fn simulate(&mut self, num_blocks: u64, payloads: Vec<Vec<u8>>) -> SimulationResult {
+    |            ^^^^^^^^
+
+warning: struct `SimulationResult` is never constructed
+   --> src/consensus.rs:313:12
+    |
+313 | pub struct SimulationResult {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: struct `NetworkBuilder` is never constructed
+   --> src/consensus.rs:321:12
+    |
+321 | pub struct NetworkBuilder { nodes: Vec<ConsensusNode>, next_id: usize }
+    |            ^^^^^^^^^^^^^^
+
+warning: associated items `new`, `add_node`, `build_minimal_bft`, and `build` are never used
+   --> src/consensus.rs:324:12
+    |
+323 | impl NetworkBuilder {
+    | ------------------- associated items in this implementation
+324 |     pub fn new() -> Self { NetworkBuilder { nodes: Vec::new(), next_id: 0 } }
+    |            ^^^
+325 |
+326 |     pub fn add_node(mut self, tier: NodeTier, trust_score: f64, stake: f64, fault_mode: FaultMode) -> Self {
+    |            ^^^^^^^^
+...
+332 |     pub fn build_minimal_bft(f: usize) -> ConsensusEngine {
+    |            ^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn build(self, f: usize) -> ConsensusEngine { ConsensusEngine::new(self.nodes, f) }
+    |            ^^^^^
+
+warning: constant `AI_CONFIDENCE_THRESHOLD` is never used
+  --> src/proposal_engine.rs:12:11
+   |
+12 | pub const AI_CONFIDENCE_THRESHOLD: f64= 0.75;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `BT_MAX_PAYLOAD` is never used
+  --> src/robot_mesh.rs:19:11
+   |
+19 | pub const BT_MAX_PAYLOAD: usize    = 512;   // Bluetooth ATT MTU
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `ZIGBEE_MAX_PAYLOAD` is never used
+  --> src/robot_mesh.rs:20:11
+   |
+20 | pub const ZIGBEE_MAX_PAYLOAD: usize= 84;    // Zigbee frame payload
+   |           ^^^^^^^^^^^^^^^^^^
+
+warning: constant `STEALTH_INTERVAL_SECS` is never used
+  --> src/robot_mesh.rs:22:11
+   |
+22 | pub const STEALTH_INTERVAL_SECS: u64 = 60;  // раз в минуту в служебном трафике
+   |           ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `BASTION_SCAN_RADIUS_M` is never used
+  --> src/robot_mesh.rs:23:11
+   |
+23 | pub const BASTION_SCAN_RADIUS_M: u32 = 30;  // радиус BT сканирования
+   |           ^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `range_m` is never used
+  --> src/robot_mesh.rs:52:12
+   |
+40 | impl RadioProtocol {
+   | ------------------ method in this implementation
+...
+52 |     pub fn range_m(&self) -> u32 {
+   |            ^^^^^^^
+
+warning: method `signal_strength_to` is never used
+   --> src/robot_mesh.rs:175:12
+    |
+151 | impl DroidNode {
+    | -------------- method in this implementation
+...
+175 |     pub fn signal_strength_to(&self, other: &DroidNode) -> f32 {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: fields `owner_node`, `floor`, and `rng` are never read
+   --> src/robot_mesh.rs:251:9
+    |
+249 | pub struct HomeBastion {
+    |            ----------- fields in this struct
+250 |     pub apartment_id: String,
+251 |     pub owner_node: String,      // Federation node ID хозяина
+    |         ^^^^^^^^^^
+252 |     pub floor: i32,
+    |         ^^^^^
+...
+258 |     rng: u64,
+    |     ^^^
+
+warning: methods `mesh_coverage` and `bastion_stats` are never used
+   --> src/robot_mesh.rs:329:12
+    |
+261 | impl HomeBastion {
+    | ---------------- methods in this implementation
+...
+329 |     pub fn mesh_coverage(&self) -> f64 {
+    |            ^^^^^^^^^^^^^
+...
+336 |     pub fn bastion_stats(&self) -> BastionStats {
+    |            ^^^^^^^^^^^^^
+
+warning: struct `BastionStats` is never constructed
+   --> src/robot_mesh.rs:367:12
+    |
+367 | pub struct BastionStats {
+    |            ^^^^^^^^^^^^
+
+warning: field `active_routes` is never read
+   --> src/robot_mesh.rs:386:9
+    |
+382 | pub struct CityMesh {
+    |            -------- field in this struct
+...
+386 |     pub active_routes: Vec<(String, String, Vec<String>)>, // from→to via droids
+    |         ^^^^^^^^^^^^^
+
+warning: constant `SAT_LATENCY_MS` is never used
+  --> src/satellite_pulse.rs:25:11
+   |
+25 | pub const SAT_LATENCY_MS: u64         = 600;   // задержка Starlink ~600мс
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `SAT_BANDWIDTH_BPS` is never used
+  --> src/satellite_pulse.rs:26:11
+   |
+26 | pub const SAT_BANDWIDTH_BPS: u64      = 9_600; // 9.6 kbps — Iridium минимум
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `PULSE_INTERVAL_SECS` is never used
+  --> src/satellite_pulse.rs:27:11
+   |
+27 | pub const PULSE_INTERVAL_SECS: u64    = 300;   // пульс каждые 5 минут
+   |           ^^^^^^^^^^^^^^^^^^^
+
+warning: methods `size_bytes` and `verify_signature` are never used
+   --> src/satellite_pulse.rs:185:12
+    |
+115 | impl FederationPulse {
+    | -------------------- methods in this implementation
+...
+185 |     pub fn size_bytes(&self) -> usize { self.encode().len() }
+    |            ^^^^^^^^^^
+186 |
+187 |     pub fn verify_signature(&self) -> bool {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: constant `FEDERATION_KEY` is never used
+   --> src/satellite_pulse.rs:203:11
+    |
+203 | pub const FEDERATION_KEY: u64 = 0xFEDE_0001_0000_C0DE;
+    |           ^^^^^^^^^^^^^^
+
+warning: fields `last_pulse` and `pulses_missed` are never read
+   --> src/satellite_pulse.rs:392:9
+    |
+388 | pub struct BlackoutMode {
+    |            ------------ fields in this struct
+...
+392 |     pub last_pulse: Option<FederationPulse>,
+    |         ^^^^^^^^^^
+393 |     pub pulses_missed: u32,
+    |         ^^^^^^^^^^^^^
+
+warning: methods `name` and `allocation_rate` are never used
+  --> src/pools.rs:40:12
+   |
+39 | impl PoolType {
+   | ------------- methods in this implementation
+40 |     pub fn name(&self) -> &str {
+   |            ^^^^
+...
+47 |     pub fn allocation_rate(&self) -> f64 {
+   |            ^^^^^^^^^^^^^^^
+
+warning: method `cost_per_accuracy_point` is never used
+   --> src/pools.rs:153:12
+    |
+149 | impl EducationSession {
+    | --------------------- method in this implementation
+...
+153 |     pub fn cost_per_accuracy_point(&self) -> f64 {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `primary_function` is never used
+   --> src/inventory.rs:153:12
+    |
+ 93 | impl DeviceRole {
+    | --------------- method in this implementation
+...
+153 |     pub fn primary_function(&self) -> &str {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: associated function `classify_batch` is never used
+   --> src/inventory.rs:210:12
+    |
+182 | impl RoleClassifier {
+    | ------------------- associated function in this implementation
+...
+210 |     pub fn classify_batch(devices: &[HardwareProfile]) -> Vec<(&HardwareProfile, DeviceRole)> {
+    |            ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_SHARDS` is never used
+  --> src/vault.rs:19:11
+   |
+19 | pub const DEFAULT_SHARDS: usize    = 5;        // N осколков
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_THRESHOLD` is never used
+  --> src/vault.rs:20:11
+   |
+20 | pub const DEFAULT_THRESHOLD: usize = 3;        // K для восстановления
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `GHOST_MEMORY_KB` is never used
+  --> src/vault.rs:21:11
+   |
+21 | pub const GHOST_MEMORY_KB: usize   = 4;        // размер осколка в памяти Ghost
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `ZK_PROOF_SIZE` is never used
+  --> src/vault.rs:22:11
+   |
+22 | pub const ZK_PROOF_SIZE: usize     = 32;       // байт ZK-доказательства
+   |           ^^^^^^^^^^^^^
+
+warning: methods `name` and `access_time_ms` are never used
+  --> src/vault.rs:36:12
+   |
+35 | impl VaultTier {
+   | -------------- methods in this implementation
+36 |     pub fn name(&self) -> &str {
+   |            ^^^^
+...
+43 |     pub fn access_time_ms(&self) -> u32 {
+   |            ^^^^^^^^^^^^^^
+
+warning: method `size_bytes` is never used
+   --> src/vault.rs:112:12
+    |
+111 | impl VaultEntry {
+    | --------------- method in this implementation
+112 |     pub fn size_bytes(&self) -> usize {
+    |            ^^^^^^^^^^
+
+warning: method `retrieve_shard` is never used
+   --> src/vault.rs:258:12
+    |
+238 | impl GhostNetwork {
+    | ----------------- method in this implementation
+...
+258 |     pub fn retrieve_shard(&self, ghost_id: &str,
+    |            ^^^^^^^^^^^^^^
+
+warning: constant `BASE_POA_REWARD` is never used
+  --> src/dag.rs:23:11
+   |
+23 | pub const BASE_POA_REWARD: f64 = 1.0;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `QUALITY_BONUS` is never used
+  --> src/dag.rs:26:11
+   |
+26 | pub const QUALITY_BONUS: f64 = 0.5;
+   |           ^^^^^^^^^^^^^
+
+warning: constant `DISHONESTY_PENALTY` is never used
+  --> src/dag.rs:29:11
+   |
+29 | pub const DISHONESTY_PENALTY: f64 = 2.0;
+   |           ^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_DAG_DEPTH` is never used
+  --> src/dag.rs:32:11
+   |
+32 | pub const MAX_DAG_DEPTH: usize = 1000;
+   |           ^^^^^^^^^^^^^
+
+warning: struct `DagNode` is never constructed
+  --> src/dag.rs:40:12
+   |
+40 | pub struct DagNode {
+   |            ^^^^^^^
+
+warning: struct `SsauSnapshot` is never constructed
+  --> src/dag.rs:67:12
+   |
+67 | pub struct SsauSnapshot {
+   |            ^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+  --> src/dag.rs:89:12
+   |
+87 | impl DagNode {
+   | ------------ associated function in this implementation
+88 |     /// Создать новую вершину DAG
+89 |     pub fn new(
+   |            ^^^
+
+warning: struct `DagEdge` is never constructed
+   --> src/dag.rs:141:12
+    |
+141 | pub struct DagEdge {
+    |            ^^^^^^^
+
+warning: struct `PoaResult` is never constructed
+   --> src/dag.rs:155:12
+    |
+155 | pub struct PoaResult {
+    |            ^^^^^^^^^
+
+warning: function `calculate_poa_reward` is never used
+   --> src/dag.rs:171:8
+    |
+171 | pub fn calculate_poa_reward(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `FederationDag` is never constructed
+   --> src/dag.rs:248:12
+    |
+248 | pub struct FederationDag {
+    |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `append_route`, `get_node_history`, `verify_chain`, `prune_old_nodes`, and `stats` are never used
+   --> src/dag.rs:262:12
+    |
+261 | impl FederationDag {
+    | ------------------ associated items in this implementation
+262 |     pub fn new() -> Self {
+    |            ^^^
+...
+274 |     pub fn append_route(
+    |            ^^^^^^^^^^^^
+...
+335 |     pub fn get_node_history(&self, node_id: &str) -> Vec<&DagNode> {
+    |            ^^^^^^^^^^^^^^^^
+...
+344 |     pub fn verify_chain(&self, node_id: &str) -> bool {
+    |            ^^^^^^^^^^^^
+...
+370 |     fn prune_old_nodes(&mut self) {
+    |        ^^^^^^^^^^^^^^^
+...
+386 |     pub fn stats(&self) -> DagStats {
+    |            ^^^^^
+
+warning: struct `DagStats` is never constructed
+   --> src/dag.rs:411:12
+    |
+411 | pub struct DagStats {
+    |            ^^^^^^^^
+
+warning: method `allowed_response_intensity` is never used
+  --> src/ethics.rs:87:12
+   |
+43 | impl AikiEthicsRule {
+   | ------------------- method in this implementation
+...
+87 |     pub fn allowed_response_intensity(&self) -> f64 {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `clean` and `penalty_for` are never used
+   --> src/ethics.rs:150:12
+    |
+149 | impl EthicsVerdict {
+    | ------------------ associated items in this implementation
+150 |     pub fn clean(action_id: &str) -> Self {
+    |            ^^^^^
+...
+163 |     pub fn penalty_for(&self, category: &str) -> f64 {
+    |            ^^^^^^^^^^^
+
+warning: field `dao_rules` is never read
+   --> src/ethics.rs:174:9
+    |
+172 | pub struct EthicsEvaluator {
+    |            --------------- field in this struct
+173 |     pub blacklisted_nodes: Vec<String>,
+174 |     pub dao_rules: Vec<DaoRule>,
+    |         ^^^^^^^^^
+
+warning: method `add_blacklisted_node` is never used
+   --> src/ethics.rs:231:12
+    |
+197 | impl EthicsEvaluator {
+    | -------------------- method in this implementation
+...
+231 |     pub fn add_blacklisted_node(&mut self, node_id: &str) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: variants `RouteSelection`, `DaoAction`, `OracleRequest`, and `AutonomousDecision` are never constructed
+   --> src/ethics.rs:401:5
+    |
+400 | pub enum EthicsAction {
+    |          ------------ variants in this enum
+401 |     RouteSelection {
+    |     ^^^^^^^^^^^^^^
+...
+407 |     DaoAction {
+    |     ^^^^^^^^^
+...
+412 |     OracleRequest {
+    |     ^^^^^^^^^^^^^
+...
+417 |     AutonomousDecision {
+    |     ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `EthicsAction` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: methods `sovereign_freeze`, `thaw`, and `is_module_frozen` are never used
+   --> src/ethics.rs:485:12
+    |
+459 | impl KillSwitch {
+    | --------------- methods in this implementation
+...
+485 |     pub fn sovereign_freeze(&mut self, dao_proposal_id: &str, reason: &str, modules: Vec<String>) {
+    |            ^^^^^^^^^^^^^^^^
+...
+521 |     pub fn thaw(&mut self, dao_proposal_id: &str) -> bool {
+    |            ^^^^
+...
+531 |     pub fn is_module_frozen(&self, module: &str) -> bool {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: method `recent_entries` is never used
+   --> src/ethics.rs:615:12
+    |
+564 | impl TransparencyAudit {
+    | ---------------------- method in this implementation
+...
+615 |     pub fn recent_entries(&self, n: usize) -> Vec<&AuditEntry> {
+    |            ^^^^^^^^^^^^^^
+
+warning: method `status` is never used
+   --> src/ethics.rs:695:12
+    |
+674 | impl EthicsLayer {
+    | ---------------- method in this implementation
+...
+695 |     pub fn status(&self) -> String {
+    |            ^^^^^^
+
+warning: constant `LOCATION_BLUR_METERS` is never used
+   --> src/ethics.rs:723:11
+    |
+723 | pub const LOCATION_BLUR_METERS: f64      = 50.0;  // координаты размыты на 50м
+    |           ^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `BIOMETRIC_BAN` is never used
+   --> src/ethics.rs:724:11
+    |
+724 | pub const BIOMETRIC_BAN: bool            = true;  // биометрия запрещена
+    |           ^^^^^^^^^^^^^
+
+warning: method `is_permitted` is never used
+   --> src/ethics.rs:795:12
+    |
+794 | impl SensorPurpose {
+    | ------------------ method in this implementation
+795 |     pub fn is_permitted(&self) -> bool {
+    |            ^^^^^^^^^^^^
+
+warning: method `score_for` is never used
+  --> src/federated.rs:86:12
+   |
+64 | impl GlobalDefenseModel {
+   | ----------------------- method in this implementation
+...
+86 |     pub fn score_for(&self, censor_type: &str, tactic: &str) -> f64 {
+   |            ^^^^^^^^^
+
+warning: constant `MAX_ROUNDS` is never used
+   --> src/federated.rs:107:11
+    |
+107 | pub const MAX_ROUNDS: usize = 100;
+    |           ^^^^^^^^^^
+
+warning: method `total_params` is never used
+   --> src/federated.rs:180:12
+    |
+129 | impl ModelWeights {
+    | ----------------- method in this implementation
+...
+180 |     pub fn total_params(&self) -> usize {
+    |            ^^^^^^^^^^^^
+
+warning: associated functions `censorship_bypass` and `attack_pattern` are never used
+   --> src/federated.rs:198:12
+    |
+197 | impl LocalDataPoint {
+    | ------------------- associated functions in this implementation
+198 |     pub fn censorship_bypass(success: bool, latency: f64, region: &str) -> Self {
+    |            ^^^^^^^^^^^^^^^^^
+...
+215 |     pub fn attack_pattern(threat_level: f64, attack_type: &str) -> Self {
+    |            ^^^^^^^^^^^^^^
+
+warning: field `region` is never read
+   --> src/federated.rs:226:9
+    |
+224 | pub struct LocalTrainer {
+    |            ------------ field in this struct
+225 |     pub node_id: String,
+226 |     pub region: String,
+    |         ^^^^^^
+
+warning: method `add_experience` is never used
+   --> src/federated.rs:245:12
+    |
+233 | impl LocalTrainer {
+    | ----------------- method in this implementation
+...
+245 |     pub fn add_experience(&mut self, point: LocalDataPoint) {
+    |            ^^^^^^^^^^^^^^
+
+warning: method `ready` is never used
+   --> src/federated.rs:405:12
+    |
+332 | impl FedAvgAggregator {
+    | --------------------- method in this implementation
+...
+405 |     pub fn ready(&self) -> bool {
+    |            ^^^^^
+
+warning: constant `MIN_STAKE_TO_PROPOSE` is never used
+ --> src/governance.rs:4:11
+  |
+4 | pub const MIN_STAKE_TO_PROPOSE: f64 = 1.0;
+  |           ^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MIN_STAKE_TO_VOTE` is never used
+ --> src/governance.rs:5:11
+  |
+5 | pub const MIN_STAKE_TO_VOTE: f64 = 0.1;
+  |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `QUORUM_PERCENT` is never used
+ --> src/governance.rs:6:11
+  |
+6 | pub const QUORUM_PERCENT: f64 = 0.51;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `VOTING_PERIOD_SECS` is never used
+ --> src/governance.rs:7:11
+  |
+7 | pub const VOTING_PERIOD_SECS: u64 = 259200; // 72 часа
+  |           ^^^^^^^^^^^^^^^^^^
+
+warning: constant `FAST_VOTE_PERIOD_SECS` is never used
+ --> src/governance.rs:8:11
+  |
+8 | pub const FAST_VOTE_PERIOD_SECS: u64 = 3600; // 1 час
+  |           ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_ACTIVE_PROPOSALS` is never used
+ --> src/governance.rs:9:11
+  |
+9 | pub const MAX_ACTIVE_PROPOSALS: usize = 10;
+  |           ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `ProposalType` is never used
+  --> src/governance.rs:12:10
+   |
+12 | pub enum ProposalType {
+   |          ^^^^^^^^^^^^
+
+warning: enum `ProposalStatus` is never used
+  --> src/governance.rs:23:10
+   |
+23 | pub enum ProposalStatus {
+   |          ^^^^^^^^^^^^^^
+
+warning: struct `Vote` is never constructed
+  --> src/governance.rs:32:12
+   |
+32 | pub struct Vote {
+   |            ^^^^
+
+warning: struct `Proposal` is never constructed
+  --> src/governance.rs:41:12
+   |
+41 | pub struct Proposal {
+   |            ^^^^^^^^
+
+warning: associated items `new`, `quorum_reached`, `is_passing`, and `participation_rate` are never used
+  --> src/governance.rs:59:12
+   |
+58 | impl Proposal {
+   | ------------- associated items in this implementation
+59 |     pub fn new(
+   |            ^^^
+...
+87 |     pub fn quorum_reached(&self, total_supply: f64) -> bool {
+   |            ^^^^^^^^^^^^^^
+...
+92 |     pub fn is_passing(&self) -> bool {
+   |            ^^^^^^^^^^
+...
+96 |     pub fn participation_rate(&self, total_supply: f64) -> f64 {
+   |            ^^^^^^^^^^^^^^^^^^
+
+warning: struct `GovernanceDao` is never constructed
+   --> src/governance.rs:103:12
+    |
+103 | pub struct GovernanceDao {
+    |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `submit_proposal`, `cast_vote`, `finalize_proposal`, `active_proposals`, and `stats` are never used
+   --> src/governance.rs:111:12
+    |
+110 | impl GovernanceDao {
+    | ------------------ associated items in this implementation
+111 |     pub fn new() -> Self { Self::default() }
+    |            ^^^
+112 |
+113 |     pub fn submit_proposal(
+    |            ^^^^^^^^^^^^^^^
+...
+136 |     pub fn cast_vote(
+    |            ^^^^^^^^^
+...
+178 |     pub fn finalize_proposal(
+    |            ^^^^^^^^^^^^^^^^^
+...
+217 |     pub fn active_proposals(&self) -> Vec<&Proposal> {
+    |            ^^^^^^^^^^^^^^^^
+...
+224 |     pub fn stats(&self) -> DaoStats {
+    |            ^^^^^
+
+warning: struct `VoteResult` is never constructed
+   --> src/governance.rs:239:12
+    |
+239 | pub struct VoteResult {
+    |            ^^^^^^^^^^
+
+warning: struct `ExecutionResult` is never constructed
+   --> src/governance.rs:248:12
+    |
+248 | pub struct ExecutionResult {
+    |            ^^^^^^^^^^^^^^^
+
+warning: struct `DaoStats` is never constructed
+   --> src/governance.rs:258:12
+    |
+258 | pub struct DaoStats {
+    |            ^^^^^^^^
+
+warning: method `name` is never used
+   --> src/governance.rs:418:12
+    |
+417 | impl FirmwareKind {
+    | ----------------- method in this implementation
+418 |     pub fn name(&self) -> &str {
+    |            ^^^^
+
+warning: field `proposals_vetoed` is never read
+   --> src/governance.rs:445:9
+    |
+440 | pub struct MeritocracyDao {
+    |            -------------- field in this struct
+...
+445 |     pub proposals_vetoed: u64,
+    |         ^^^^^^^^^^^^^^^^
+
+warning: fields `success`, `voter`, and `approve` are never read
+   --> src/governance.rs:603:9
+    |
+602 | pub struct VoteFirmwareResult {
+    |            ------------------ fields in this struct
+603 |     pub success: bool, pub voter: String, pub weight: f64,
+    |         ^^^^^^^            ^^^^^
+604 |     pub approve: bool, pub votes_for: f64, pub votes_against: f64,
+    |         ^^^^^^^
+    |
+    = note: `VoteFirmwareResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `votes_for` and `votes_against` are never read
+   --> src/governance.rs:624:9
+    |
+622 | pub struct FinalizeResult {
+    |            -------------- fields in this struct
+623 |     pub passed: bool, pub reason: String,
+624 |     pub votes_for: f64, pub votes_against: f64, pub participation: f64,
+    |         ^^^^^^^^^           ^^^^^^^^^^^^^
+    |
+    = note: `FinalizeResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: constant `SCAN_RATE_THRESHOLD` is never used
+  --> src/mirage.rs:32:11
+   |
+32 | pub const SCAN_RATE_THRESHOLD: f64 = 10.0;
+   |           ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `UNIQUE_SOURCES_THRESHOLD` is never used
+  --> src/mirage.rs:35:11
+   |
+35 | pub const UNIQUE_SOURCES_THRESHOLD: usize = 5;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `TIMING_ANOMALY_THRESHOLD` is never used
+  --> src/mirage.rs:38:11
+   |
+38 | pub const TIMING_ANOMALY_THRESHOLD: f64 = 0.15;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MIRAGE_TTL_SECS` is never used
+  --> src/mirage.rs:41:11
+   |
+41 | pub const MIRAGE_TTL_SECS: u64 = 300;
+   |           ^^^^^^^^^^^^^^^
+
+warning: enum `AnomalyType` is never used
+  --> src/mirage.rs:49:10
+   |
+49 | pub enum AnomalyType {
+   |          ^^^^^^^^^^^
+
+warning: struct `AnomalyScore` is never constructed
+  --> src/mirage.rs:64:12
+   |
+64 | pub struct AnomalyScore {
+   |            ^^^^^^^^^^^^
+
+warning: struct `SourceStats` is never constructed
+  --> src/mirage.rs:83:8
+   |
+83 | struct SourceStats {
+   |        ^^^^^^^^^^^
+
+warning: struct `AnomalyDetector` is never constructed
+  --> src/mirage.rs:94:12
+   |
+94 | pub struct AnomalyDetector {
+   |            ^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `record_request`, `analyze`, `variance`, `coefficient_of_variation`, and `stats` are never used
+   --> src/mirage.rs:104:12
+    |
+103 | impl AnomalyDetector {
+    | -------------------- associated items in this implementation
+104 |     pub fn new() -> Self {
+    |            ^^^
+...
+109 |     pub fn record_request(
+    |            ^^^^^^^^^^^^^^
+...
+137 |     fn analyze(&self, source_id: &str) -> AnomalyScore {
+    |        ^^^^^^^
+...
+217 |     fn variance(values: &[f64]) -> f64 {
+    |        ^^^^^^^^
+...
+223 |     fn coefficient_of_variation(values: &[f64]) -> f64 {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+231 |     pub fn stats(&self) -> String {
+    |            ^^^^^
+
+warning: struct `MimicryMatrix` is never constructed
+   --> src/mirage.rs:247:12
+    |
+247 | pub struct MimicryMatrix {
+    |            ^^^^^^^^^^^^^
+
+warning: associated functions `perfect_lure`, `dead_node`, and `maze` are never used
+   --> src/mirage.rs:260:12
+    |
+258 | impl MimicryMatrix {
+    | ------------------ associated functions in this implementation
+259 |     /// Режим «Идеальный узел» — выглядим слишком хорошо (приманка)
+260 |     pub fn perfect_lure() -> Self {
+    |            ^^^^^^^^^^^^
+...
+270 |     pub fn dead_node() -> Self {
+    |            ^^^^^^^^^
+...
+280 |     pub fn maze() -> Self {
+    |            ^^^^
+
+warning: struct `MirageGenerator` is never constructed
+   --> src/mirage.rs:294:12
+    |
+294 | pub struct MirageGenerator {
+    |            ^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `next_rand`, and `generate_fake_tensor` are never used
+   --> src/mirage.rs:304:12
+    |
+303 | impl MirageGenerator {
+    | -------------------- associated items in this implementation
+304 |     pub fn new(matrix: MimicryMatrix) -> Self {
+    |            ^^^
+...
+313 |     fn next_rand(&mut self) -> f64 {
+    |        ^^^^^^^^^
+...
+325 |     pub fn generate_fake_tensor(
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `MimicryStrategy` is never used
+   --> src/mirage.rs:382:10
+    |
+382 | pub enum MimicryStrategy {
+    |          ^^^^^^^^^^^^^^^
+
+warning: struct `FakeTensor` is never constructed
+   --> src/mirage.rs:390:12
+    |
+390 | pub struct FakeTensor {
+    |            ^^^^^^^^^^
+
+warning: struct `MazeNode` is never constructed
+   --> src/mirage.rs:410:12
+    |
+410 | pub struct MazeNode {
+    |            ^^^^^^^^
+
+warning: struct `MazeTrap` is never constructed
+   --> src/mirage.rs:422:12
+    |
+422 | pub struct MazeTrap {
+    |            ^^^^^^^^
+
+warning: associated items `create_for_attacker` and `simulate_packet` are never used
+   --> src/mirage.rs:431:12
+    |
+429 | impl MazeTrap {
+    | ------------- associated items in this implementation
+430 |     /// Создать лабиринт для конкретного атакующего
+431 |     pub fn create_for_attacker(attacker_id: &str, depth: usize) -> Self {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+458 |     pub fn simulate_packet(&self, max_hops: usize) -> MazeSimResult {
+    |            ^^^^^^^^^^^^^^^
+
+warning: struct `MazeSimResult` is never constructed
+   --> src/mirage.rs:488:12
+    |
+488 | pub struct MazeSimResult {
+    |            ^^^^^^^^^^^^^
+
+warning: struct `MirageNode` is never constructed
+   --> src/mirage.rs:501:12
+    |
+501 | pub struct MirageNode {
+    |            ^^^^^^^^^^
+
+warning: associated items `new`, `handle_request`, and `status` are never used
+   --> src/mirage.rs:512:12
+    |
+511 | impl MirageNode {
+    | --------------- associated items in this implementation
+512 |     pub fn new(node_id: &str) -> Self {
+    |            ^^^
+...
+525 |     pub fn handle_request(
+    |            ^^^^^^^^^^^^^^
+...
+577 |     pub fn status(&self) -> String {
+    |            ^^^^^^
+
+warning: enum `MirageResponse` is never used
+   --> src/mirage.rs:591:10
+    |
+591 | pub enum MirageResponse {
+    |          ^^^^^^^^^^^^^^
+
+warning: constant `MIMICRY_OVERHEAD` is never used
+  --> src/mutation.rs:19:11
+   |
+19 | pub const MIMICRY_OVERHEAD: f64 = 0.15;
+   |           ^^^^^^^^^^^^^^^^
+
+warning: associated items `name`, `default_strike`, and `default_aiki` are never used
+  --> src/mutation.rs:48:12
+   |
+47 | impl MutationStrategy {
+   | --------------------- associated items in this implementation
+48 |     pub fn name(&self) -> &str {
+   |            ^^^^
+...
+57 |     pub fn default_strike() -> Self {
+   |            ^^^^^^^^^^^^^^
+...
+71 |     pub fn default_aiki() -> Self {
+   |            ^^^^^^^^^^^^
+
+warning: method `overhead_bytes` is never used
+   --> src/mutation.rs:121:12
+    |
+ 92 | impl TrafficMask {
+    | ---------------- method in this implementation
+...
+121 |     pub fn overhead_bytes(&self) -> usize {
+    |            ^^^^^^^^^^^^^^
+
+warning: method `jitter_entropy` is never used
+   --> src/mutation.rs:225:12
+    |
+171 | impl StandoffLayer {
+    | ------------------ method in this implementation
+...
+225 |     pub fn jitter_entropy(&self) -> f64 {
+    |            ^^^^^^^^^^^^^^
+
+warning: method `total_packets` is never used
+   --> src/mutation.rs:246:12
+    |
+245 | impl DecoyBundle {
+    | ---------------- method in this implementation
+246 |     pub fn total_packets(&self) -> usize { self.decoys.len() + 1 }
+    |            ^^^^^^^^^^^^^
+
+warning: method `effective_throughput` is never used
+   --> src/mutation.rs:330:12
+    |
+275 | impl CumulativeJet {
+    | ------------------ method in this implementation
+...
+330 |     pub fn effective_throughput(&self, base_mbps: f64) -> f64 {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `stats` is never used
+   --> src/mutation.rs:546:12
+    |
+466 | impl MutationEngine {
+    | ------------------- method in this implementation
+...
+546 |     pub fn stats(&self) -> MutationStats {
+    |            ^^^^^
+
+warning: struct `MutationStats` is never constructed
+   --> src/mutation.rs:571:12
+    |
+571 | pub struct MutationStats {
+    |            ^^^^^^^^^^^^^
+
+warning: constant `PROTOCOL_VERSION` is never used
+ --> src/network.rs:7:11
+  |
+7 | pub const PROTOCOL_VERSION: u8 = 1;
+  |           ^^^^^^^^^^^^^^^^
+
+warning: enum `FederationMessage` is never used
+  --> src/network.rs:11:10
+   |
+11 | pub enum FederationMessage {
+   |          ^^^^^^^^^^^^^^^^^
+
+warning: struct `HandshakePayload` is never constructed
+  --> src/network.rs:23:12
+   |
+23 | pub struct HandshakePayload {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: struct `HandshakeAckPayload` is never constructed
+  --> src/network.rs:33:12
+   |
+33 | pub struct HandshakeAckPayload {
+   |            ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NodeCapabilities` is never constructed
+  --> src/network.rs:42:12
+   |
+42 | pub struct NodeCapabilities {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: struct `SsauUpdatePayload` is never constructed
+  --> src/network.rs:50:12
+   |
+50 | pub struct SsauUpdatePayload {
+   |            ^^^^^^^^^^^^^^^^^
+
+warning: struct `SsauTensorMessage` is never constructed
+  --> src/network.rs:57:12
+   |
+57 | pub struct SsauTensorMessage {
+   |            ^^^^^^^^^^^^^^^^^
+
+warning: struct `RouteRequestPayload` is never constructed
+  --> src/network.rs:86:12
+   |
+86 | pub struct RouteRequestPayload {
+   |            ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `RouteResponsePayload` is never constructed
+  --> src/network.rs:97:12
+   |
+97 | pub struct RouteResponsePayload {
+   |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `HeartbeatPayload` is never constructed
+   --> src/network.rs:108:12
+    |
+108 | pub struct HeartbeatPayload {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: struct `NodeInfo` is never constructed
+   --> src/network.rs:116:12
+    |
+116 | pub struct NodeInfo {
+    |            ^^^^^^^^
+
+warning: struct `FederationPacket` is never constructed
+   --> src/network.rs:125:12
+    |
+125 | pub struct FederationPacket {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: struct `PacketHeader` is never constructed
+   --> src/network.rs:132:12
+    |
+132 | pub struct PacketHeader {
+    |            ^^^^^^^^^^^^
+
+warning: struct `PacketBuilder` is never constructed
+   --> src/network.rs:142:12
+    |
+142 | pub struct PacketBuilder {
+    |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `to`, `with_ttl`, and `build` are never used
+   --> src/network.rs:149:12
+    |
+148 | impl PacketBuilder {
+    | ------------------ associated items in this implementation
+149 |     pub fn new(sender_id: &str) -> Self {
+    |            ^^^
+...
+153 |     pub fn to(mut self, recipient_id: &str) -> Self {
+    |            ^^
+...
+158 |     pub fn with_ttl(mut self, ttl: u8) -> Self {
+    |            ^^^^^^^^
+...
+163 |     pub fn build(self, message: FederationMessage) -> FederationPacket {
+    |            ^^^^^
+
+warning: function `serialize_packet` is never used
+   --> src/network.rs:184:8
+    |
+184 | pub fn serialize_packet(packet: &FederationPacket) -> Result<Vec<u8>, serde_json::Error> {
+    |        ^^^^^^^^^^^^^^^^
+
+warning: function `deserialize_packet` is never used
+   --> src/network.rs:188:8
+    |
+188 | pub fn deserialize_packet(bytes: &[u8]) -> Result<FederationPacket, serde_json::Error> {
+    |        ^^^^^^^^^^^^^^^^^^
+
+warning: type alias `PacketSender` is never used
+   --> src/network.rs:192:10
+    |
+192 | pub type PacketSender = mpsc::Sender<FederationPacket>;
+    |          ^^^^^^^^^^^^
+
+warning: type alias `PacketReceiver` is never used
+   --> src/network.rs:193:10
+    |
+193 | pub type PacketReceiver = mpsc::Receiver<FederationPacket>;
+    |          ^^^^^^^^^^^^^^
+
+warning: struct `NodeContext` is never constructed
+   --> src/network.rs:195:12
+    |
+195 | pub struct NodeContext {
+    |            ^^^^^^^^^^^
+
+warning: associated items `new`, `add_peer`, `send_to_peer`, `broadcast`, and `process_next` are never used
+   --> src/network.rs:205:12
+    |
+204 | impl NodeContext {
+    | ---------------- associated items in this implementation
+205 |     pub fn new(node_id: &str) -> (Self, PacketSender) {
+    |            ^^^
+...
+219 |     pub fn add_peer(&mut self, peer_id: &str, sender: PacketSender) {
+    |            ^^^^^^^^
+...
+223 |     pub async fn send_to_peer(&mut self, peer_id: &str, packet: FederationPacket) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^
+...
+234 |     pub async fn broadcast(&mut self, packet: FederationPacket) -> usize {
+    |                  ^^^^^^^^^
+...
+250 |     pub async fn process_next(&mut self) -> Option<FederationPacket> {
+    |                  ^^^^^^^^^^^^
+
+warning: function `create_handshake_packet` is never used
+   --> src/network.rs:258:8
+    |
+258 | pub fn create_handshake_packet(our_node_id: &str, their_node_id: &str, public_key: &str, known_peers: u32) -> FederationPacket {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `create_ssau_update_packet` is never used
+   --> src/network.rs:276:8
+    |
+276 | pub fn create_ssau_update_packet(our_node_id: &str, tensors: &[&SsauTensor], sequence: u64) -> FederationPacket {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `CONGESTION_WINDOW` is never used
+  --> src/neural_node.rs:26:11
+   |
+26 | pub const CONGESTION_WINDOW: usize = 10;
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `CONGESTION_THRESHOLD` is never used
+  --> src/neural_node.rs:27:11
+   |
+27 | pub const CONGESTION_THRESHOLD: f64 = 0.65;
+   |           ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `predict_congestion` is never used
+   --> src/neural_node.rs:202:12
+    |
+107 | impl NeuralState {
+    | ---------------- method in this implementation
+...
+202 |     pub fn predict_congestion(&mut self, current_latency_ms: f64) -> CongestionPrediction {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: associated function `from_ssau` is never used
+   --> src/neural_node.rs:290:12
+    |
+284 | impl NeuralInput {
+    | ---------------- associated function in this implementation
+...
+290 |     pub fn from_ssau(latency_ms: f64, bandwidth_mbps: f64,
+    |            ^^^^^^^^^
+
+warning: fields `hidden_state` and `tactic` are never read
+   --> src/neural_node.rs:368:9
+    |
+361 | pub struct NeuralOutput {
+    |            ------------ fields in this struct
+...
+368 |     pub hidden_state:    Vec<f64>,
+    |         ^^^^^^^^^^^^
+369 |     pub tactic:          NeuralTactic,
+    |         ^^^^^^
+
+warning: associated functions `under_attack` and `cumulative_strike` are never used
+   --> src/neural_node.rs:391:12
+    |
+382 | impl NeuralTarget {
+    | ----------------- associated functions in this implementation
+...
+391 |     pub fn under_attack(decoy: f64, strike: f64) -> Self {
+    |            ^^^^^^^^^^^^
+...
+395 |     pub fn cumulative_strike() -> Self {
+    |            ^^^^^^^^^^^^^^^^^
+
+warning: fields `node_id` and `global_state` are never read
+   --> src/neural_node.rs:422:9
+    |
+421 | pub struct NeuralRouter {
+    |            ------------ fields in this struct
+422 |     pub node_id: String,
+    |         ^^^^^^^
+423 |     pub states: HashMap<String, NeuralState>,
+424 |     pub global_state: NeuralState,
+    |         ^^^^^^^^^^^^
+
+warning: method `score_route` is never used
+   --> src/neural_node.rs:441:12
+    |
+429 | impl NeuralRouter {
+    | ----------------- method in this implementation
+...
+441 |     pub fn score_route(&mut self, neighbor_id: &str, input: &NeuralInput) -> NeuralOutput {
+    |            ^^^^^^^^^^^
+
+warning: constant `CPU_HEAVY_THRESHOLD` is never used
+   --> src/neural_node.rs:531:11
+    |
+531 | pub const CPU_HEAVY_THRESHOLD: f64  = 0.70; // >70% CPU = тяжело
+    |           ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MEM_CRITICAL` is never used
+   --> src/neural_node.rs:532:11
+    |
+532 | pub const MEM_CRITICAL: f64         = 0.85; // >85% RAM = критично
+    |           ^^^^^^^^^^^^
+
+warning: fields `cpu_cores` and `is_mobile` are never read
+   --> src/neural_node.rs:543:9
+    |
+541 | pub struct ResourceProfile {
+    |            --------------- fields in this struct
+542 |     pub node_id: String,
+543 |     pub cpu_cores: u8,
+    |         ^^^^^^^^^
+...
+549 |     pub is_mobile: bool,
+    |         ^^^^^^^^^
+    |
+    = note: `ResourceProfile` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: methods `max_layers`, `allows_heavy_analytics`, `allows_federated_training`, and `allows_onion_routing` are never used
+   --> src/neural_node.rs:602:12
+    |
+585 | impl ComputeBudget {
+    | ------------------ methods in this implementation
+...
+602 |     pub fn max_layers(&self) -> usize {
+    |            ^^^^^^^^^^
+...
+611 |     pub fn allows_heavy_analytics(&self) -> bool {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+614 |     pub fn allows_federated_training(&self) -> bool {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+617 |     pub fn allows_onion_routing(&self) -> bool {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `node_id`, `cpu_load`, `ram_load`, and `is_throttling` are never read
+   --> src/neural_node.rs:733:9
+    |
+732 | pub struct SchedulerStats {
+    |            -------------- fields in this struct
+733 |     pub node_id: String,
+    |         ^^^^^^^
+...
+738 |     pub cpu_load: f64,
+    |         ^^^^^^^^
+739 |     pub ram_load: f64,
+    |         ^^^^^^^^
+740 |     pub is_throttling: bool,
+    |         ^^^^^^^^^^^^^
+    |
+    = note: `SchedulerStats` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: constant `MIN_ORACLE_CONFIRMATIONS` is never used
+ --> src/oracle.rs:4:11
+  |
+4 | pub const MIN_ORACLE_CONFIRMATIONS: usize = 3;
+  |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_PRICE_DEVIATION` is never used
+ --> src/oracle.rs:5:11
+  |
+5 | pub const MAX_PRICE_DEVIATION: f64 = 0.05;
+  |           ^^^^^^^^^^^^^^^^^^^
+
+warning: constant `ORACLE_TTL_SECS` is never used
+ --> src/oracle.rs:6:11
+  |
+6 | pub const ORACLE_TTL_SECS: u64 = 300;
+  |           ^^^^^^^^^^^^^^^
+
+warning: constant `MAX_RESPONSE_SIZE` is never used
+ --> src/oracle.rs:7:11
+  |
+7 | pub const MAX_RESPONSE_SIZE: usize = 65536;
+  |           ^^^^^^^^^^^^^^^^^
+
+warning: enum `OracleRequestType` is never used
+  --> src/oracle.rs:10:10
+   |
+10 | pub enum OracleRequestType {
+   |          ^^^^^^^^^^^^^^^^^
+
+warning: struct `OracleRequest` is never constructed
+  --> src/oracle.rs:20:12
+   |
+20 | pub struct OracleRequest {
+   |            ^^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+  --> src/oracle.rs:32:12
+   |
+31 | impl OracleRequest {
+   | ------------------ associated function in this implementation
+32 |     pub fn new(requester_id: &str, request_type: OracleRequestType, is_private: bool) -> Self {
+   |            ^^^
+
+warning: struct `OracleResponse` is never constructed
+  --> src/oracle.rs:52:12
+   |
+52 | pub struct OracleResponse {
+   |            ^^^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+  --> src/oracle.rs:64:12
+   |
+63 | impl OracleResponse {
+   | ------------------- associated function in this implementation
+64 |     pub fn new(request_id: &str, responder_id: &str, raw_value: &str, numeric_value: Option<f64>, latency_ms: u64) -> Self {
+   |            ^^^
+
+warning: struct `ZkContainer` is never constructed
+  --> src/oracle.rs:83:12
+   |
+83 | pub struct ZkContainer {
+   |            ^^^^^^^^^^^
+
+warning: associated items `build` and `verify` are never used
+   --> src/oracle.rs:98:12
+    |
+ 97 | impl ZkContainer {
+    | ---------------- associated items in this implementation
+ 98 |     pub fn build(request_id: &str, responses: &[OracleResponse]) -> Option<Self> {
+    |            ^^^^^
+...
+149 |     pub fn verify(&self) -> bool { self.is_valid && self.confirmations >= MIN_ORACLE_CONFIRMATIONS }
+    |            ^^^^^^
+
+warning: struct `OracleConsensus` is never constructed
+   --> src/oracle.rs:152:12
+    |
+152 | pub struct OracleConsensus {
+    |            ^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `submit_response`, and `get_result` are never used
+   --> src/oracle.rs:161:12
+    |
+160 | impl OracleConsensus {
+    | -------------------- associated items in this implementation
+161 |     pub fn new() -> Self {
+    |            ^^^
+...
+168 |     pub fn submit_response(&mut self, response: OracleResponse) -> Option<ZkContainer> {
+    |            ^^^^^^^^^^^^^^^
+...
+183 |     pub fn get_result(&self, request_id: &str) -> Option<&ZkContainer> {
+    |            ^^^^^^^^^^
+
+warning: struct `OracleRegistry` is never constructed
+   --> src/oracle.rs:190:12
+    |
+190 | pub struct OracleRegistry {
+    |            ^^^^^^^^^^^^^^
+
+warning: associated items `new`, `request`, `submit_response`, `simulate_fetch`, and `stats` are never used
+   --> src/oracle.rs:198:12
+    |
+197 | impl OracleRegistry {
+    | ------------------- associated items in this implementation
+198 |     pub fn new(node_id: &str) -> Self {
+    |            ^^^
+...
+207 |     pub fn request(&mut self, req_type: OracleRequestType, is_private: bool) -> OracleRequest {
+    |            ^^^^^^^
+...
+214 |     pub fn submit_response(&mut self, response: OracleResponse) -> Option<ZkContainer> {
+    |            ^^^^^^^^^^^^^^^
+...
+218 |     pub fn simulate_fetch(req_type: &OracleRequestType, responder_id: &str, request_id: &str) -> OracleResponse {
+    |            ^^^^^^^^^^^^^^
+...
+248 |     pub fn stats(&self) -> OracleStats {
+    |            ^^^^^
+
+warning: struct `OracleStats` is never constructed
+   --> src/oracle.rs:260:12
+    |
+260 | pub struct OracleStats {
+    |            ^^^^^^^^^^^
+
+warning: constant `PEER_EXCHANGE_INTERVAL_SECS` is never used
+  --> src/overlay.rs:32:11
+   |
+32 | pub const PEER_EXCHANGE_INTERVAL_SECS: u64 = 60;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SSAU_BROADCAST_INTERVAL_SECS` is never used
+  --> src/overlay.rs:35:11
+   |
+35 | pub const SSAU_BROADCAST_INTERVAL_SECS: u64 = 15;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `ROUTE_AUDIT_INTERVAL_SECS` is never used
+  --> src/overlay.rs:38:11
+   |
+38 | pub const ROUTE_AUDIT_INTERVAL_SECS: u64 = 30;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_SEED_NODES` is never used
+  --> src/overlay.rs:41:11
+   |
+41 | pub const MAX_SEED_NODES: usize = 8;
+   |           ^^^^^^^^^^^^^^
+
+warning: struct `SeedNode` is never constructed
+  --> src/overlay.rs:48:12
+   |
+48 | pub struct SeedNode {
+   |            ^^^^^^^^
+
+warning: associated function `new` is never used
+  --> src/overlay.rs:56:12
+   |
+55 | impl SeedNode {
+   | ------------- associated function in this implementation
+56 |     pub fn new(address: &str, node_id: &str, region: &str) -> Self {
+   |            ^^^
+
+warning: function `default_seed_nodes` is never used
+  --> src/overlay.rs:67:8
+   |
+67 | pub fn default_seed_nodes() -> Vec<SeedNode> {
+   |        ^^^^^^^^^^^^^^^^^^
+
+warning: struct `BootstrapManager` is never constructed
+  --> src/overlay.rs:78:12
+   |
+78 | pub struct BootstrapManager {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: associated items `new` and `bootstrap` are never used
+  --> src/overlay.rs:85:12
+   |
+84 | impl BootstrapManager {
+   | --------------------- associated items in this implementation
+85 |     pub fn new(seeds: Vec<SeedNode>) -> Self {
+   |            ^^^
+...
+94 |     pub async fn bootstrap(&mut self, node: Arc<FederationNode>) -> usize {
+   |                  ^^^^^^^^^
+
+warning: struct `OverlayStats` is never constructed
+   --> src/overlay.rs:128:12
+    |
+128 | pub struct OverlayStats {
+    |            ^^^^^^^^^^^^
+
+warning: struct `FederationMVP` is never constructed
+   --> src/overlay.rs:175:12
+    |
+175 | pub struct FederationMVP {
+    |            ^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/overlay.rs:199:12
+    |
+197 | impl FederationMVP {
+    | ------------------ associated items in this implementation
+198 |     /// Создать новый MVP узел
+199 |     pub fn new(node_id: &str, port: u16) -> Arc<Self> {
+    |            ^^^
+...
+222 |     pub async fn start(self: Arc<Self>, seeds: Vec<SeedNode>) {
+    |                  ^^^^^
+...
+293 |     pub async fn send_onion(
+    |                  ^^^^^^^^^^
+...
+326 |     pub async fn compute_route(
+    |                  ^^^^^^^^^^^^^
+...
+351 |     pub async fn record_route_to_dag(
+    |                  ^^^^^^^^^^^^^^^^^^^
+...
+376 |     async fn ssau_broadcast_loop(self: Arc<Self>) {
+    |              ^^^^^^^^^^^^^^^^^^^
+...
+388 |     async fn route_audit_loop(self: Arc<Self>) {
+    |              ^^^^^^^^^^^^^^^^
+...
+405 |     pub async fn collect_stats(self: Arc<Self>) -> OverlayStats {
+    |                  ^^^^^^^^^^^^^
+
+warning: constant `DEFAULT_FEDERATION_PORT` is never used
+  --> src/p2p.rs:14:11
+   |
+14 | pub const DEFAULT_FEDERATION_PORT: u16 = 7777;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `HANDSHAKE_TIMEOUT_SECS` is never used
+  --> src/p2p.rs:15:11
+   |
+15 | pub const HANDSHAKE_TIMEOUT_SECS: u64 = 10;
+   |           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_PACKET_SIZE` is never used
+  --> src/p2p.rs:16:11
+   |
+16 | pub const MAX_PACKET_SIZE: usize = 4 * 1024 * 1024;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `HEARTBEAT_INTERVAL_SECS` is never used
+  --> src/p2p.rs:17:11
+   |
+17 | pub const HEARTBEAT_INTERVAL_SECS: u64 = 30;
+   |           ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `ConnectionState` is never used
+  --> src/p2p.rs:20:10
+   |
+20 | pub enum ConnectionState {
+   |          ^^^^^^^^^^^^^^^
+
+warning: struct `PeerConnection` is never constructed
+  --> src/p2p.rs:28:12
+   |
+28 | pub struct PeerConnection {
+   |            ^^^^^^^^^^^^^^
+
+warning: associated items `new`, `send_packet`, `recv_packet`, and `uptime_secs` are never used
+  --> src/p2p.rs:40:12
+   |
+39 | impl PeerConnection {
+   | ------------------- associated items in this implementation
+40 |     pub fn new(peer_id: String, peer_addr: SocketAddr, stream: TcpStream) -> Self {
+   |            ^^^
+...
+53 |     pub async fn send_packet(&mut self, packet: &FederationPacket) -> Result<(), String> {
+   |                  ^^^^^^^^^^^
+...
+67 |     pub async fn recv_packet(&mut self) -> Result<FederationPacket, String> {
+   |                  ^^^^^^^^^^^
+...
+82 |     pub fn uptime_secs(&self) -> u64 {
+   |            ^^^^^^^^^^^
+
+warning: struct `NodeConfig` is never constructed
+  --> src/p2p.rs:88:12
+   |
+88 | pub struct NodeConfig {
+   |            ^^^^^^^^^^
+
+warning: associated function `new` is never used
+  --> src/p2p.rs:97:12
+   |
+96 | impl NodeConfig {
+   | --------------- associated function in this implementation
+97 |     pub fn new(node_id: &str, port: u16) -> Self {
+   |            ^^^
+
+warning: struct `FederationNode` is never constructed
+   --> src/p2p.rs:109:12
+    |
+109 | pub struct FederationNode {
+    |            ^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/p2p.rs:119:12
+    |
+118 | impl FederationNode {
+    | ------------------- associated items in this implementation
+119 |     pub fn new(config: NodeConfig) -> Arc<Self> {
+    |            ^^^
+...
+130 |     pub async fn start_listener(self: Arc<Self>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^
+...
+151 |     async fn handle_incoming(self: Arc<Self>, stream: TcpStream, peer_addr: SocketAddr) -> Result<(), String> {
+    |              ^^^^^^^^^^^^^^^
+...
+198 |     pub async fn connect_to_peer(self: Arc<Self>, peer_addr: &str) -> Result<String, String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+242 |     async fn peer_message_loop(self: Arc<Self>, peer_id: String) {
+    |              ^^^^^^^^^^^^^^^^^
+...
+268 |     async fn dispatch_message(self: Arc<Self>, packet: FederationPacket) {
+    |              ^^^^^^^^^^^^^^^^
+...
+307 |     pub async fn start_heartbeat_loop(self: Arc<Self>) {
+    |                  ^^^^^^^^^^^^^^^^^^^^
+...
+334 |     pub async fn status(&self) -> NodeStatus {
+    |                  ^^^^^^
+
+warning: struct `NodeStatus` is never constructed
+   --> src/p2p.rs:353:12
+    |
+353 | pub struct NodeStatus {
+    |            ^^^^^^^^^^
+
+warning: constant `ENTROPY_SWITCH_THRESHOLD` is never used
+ --> src/routing.rs:5:11
+  |
+5 | pub const ENTROPY_SWITCH_THRESHOLD: f64 = 0.4;
+  |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SWITCH_PROBABILITY_DELTA` is never used
+ --> src/routing.rs:6:11
+  |
+6 | pub const SWITCH_PROBABILITY_DELTA: f64 = 0.15;
+  |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `UserPriorities` is never constructed
+ --> src/routing.rs:9:12
+  |
+9 | pub struct UserPriorities {
+  |            ^^^^^^^^^^^^^^
+
+warning: associated items `speed_first`, `anonymity_first`, `balanced`, and `normalize` are never used
+  --> src/routing.rs:17:12
+   |
+16 | impl UserPriorities {
+   | ------------------- associated items in this implementation
+17 |     pub fn speed_first() -> Self {
+   |            ^^^^^^^^^^^
+...
+20 |     pub fn anonymity_first() -> Self {
+   |            ^^^^^^^^^^^^^^^
+...
+23 |     pub fn balanced() -> Self {
+   |            ^^^^^^^^
+...
+26 |     pub fn normalize(mut self) -> Self {
+   |            ^^^^^^^^^
+
+warning: struct `RouteCandidate` is never constructed
+  --> src/routing.rs:39:12
+   |
+39 | pub struct RouteCandidate {
+   |            ^^^^^^^^^^^^^^
+
+warning: associated function `from_tensors` is never used
+  --> src/routing.rs:53:12
+   |
+52 | impl RouteCandidate {
+   | ------------------- associated function in this implementation
+53 |     pub fn from_tensors(tensors: Vec<SsauTensor>, path: Vec<String>) -> Self {
+   |            ^^^^^^^^^^^^
+
+warning: struct `ScoringContext` is never constructed
+  --> src/routing.rs:73:12
+   |
+73 | pub struct ScoringContext {
+   |            ^^^^^^^^^^^^^^
+
+warning: associated function `from_candidates` is never used
+  --> src/routing.rs:80:12
+   |
+79 | impl ScoringContext {
+   | ------------------- associated function in this implementation
+80 |     pub fn from_candidates(candidates: &[RouteCandidate]) -> Self {
+   |            ^^^^^^^^^^^^^^^
+
+warning: function `score_route` is never used
+  --> src/routing.rs:92:8
+   |
+92 | pub fn score_route(candidate: &RouteCandidate, priorities: &UserPriorities, context: &ScoringContext) -> f64 {
+   |        ^^^^^^^^^^^
+
+warning: function `softmax` is never used
+   --> src/routing.rs:105:8
+    |
+105 | pub fn softmax(scores: &[f64]) -> Vec<f64> {
+    |        ^^^^^^^
+
+warning: struct `RoutingDecision` is never constructed
+   --> src/routing.rs:117:12
+    |
+117 | pub struct RoutingDecision {
+    |            ^^^^^^^^^^^^^^^
+
+warning: struct `RouterStats` is never constructed
+   --> src/routing.rs:126:12
+    |
+126 | pub struct RouterStats {
+    |            ^^^^^^^^^^^
+
+warning: struct `AiRouter` is never constructed
+   --> src/routing.rs:133:12
+    |
+133 | pub struct AiRouter {
+    |            ^^^^^^^^
+
+warning: associated items `new`, `select_route`, `check_should_switch`, `audit_active_routes`, and `stats` are never used
+   --> src/routing.rs:139:12
+    |
+138 | impl AiRouter {
+    | ------------- associated items in this implementation
+139 |     pub fn new() -> Self {
+    |            ^^^
+...
+143 |     pub fn select_route(
+    |            ^^^^^^^^^^^^
+...
+187 |     fn check_should_switch(&self, destination: &str, best: &RouteCandidate, _all: &[RouteCandidate]) -> bool {
+    |        ^^^^^^^^^^^^^^^^^^^
+...
+207 |     pub fn audit_active_routes(&self) -> Vec<String> {
+    |            ^^^^^^^^^^^^^^^^^^^
+...
+214 |     pub fn stats(&self) -> RouterStats {
+    |            ^^^^^
+
+warning: function `build_route_candidates` is never used
+   --> src/routing.rs:230:8
+    |
+230 | pub fn build_route_candidates(
+    |        ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `dfs_paths` is never used
+   --> src/routing.rs:246:4
+    |
+246 | fn dfs_paths(
+    |    ^^^^^^^^^
+
+warning: constant `MIN_SHARD_SIZE` is never used
+ --> src/shard.rs:5:11
+  |
+5 | pub const MIN_SHARD_SIZE: usize = 3;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `MAX_SHARD_SIZE` is never used
+ --> src/shard.rs:6:11
+  |
+6 | pub const MAX_SHARD_SIZE: usize = 50;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `SPLIT_THRESHOLD` is never used
+ --> src/shard.rs:7:11
+  |
+7 | pub const SPLIT_THRESHOLD: f64 = 0.4;
+  |           ^^^^^^^^^^^^^^^
+
+warning: constant `MERGE_THRESHOLD` is never used
+ --> src/shard.rs:8:11
+  |
+8 | pub const MERGE_THRESHOLD: f64 = 0.7;
+  |           ^^^^^^^^^^^^^^^
+
+warning: constant `RENDEZVOUS_TTL` is never used
+ --> src/shard.rs:9:11
+  |
+9 | pub const RENDEZVOUS_TTL: u8 = 5;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `BRIDGE_ELECTION_QUORUM` is never used
+  --> src/shard.rs:10:11
+   |
+10 | pub const BRIDGE_ELECTION_QUORUM: usize = 2;
+   |           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `ThreatLevel` is never used
+  --> src/shard.rs:13:10
+   |
+13 | pub enum ThreatLevel {
+   |          ^^^^^^^^^^^
+
+warning: enum `NetworkEvent` is never used
+  --> src/shard.rs:25:10
+   |
+25 | pub enum NetworkEvent {
+   |          ^^^^^^^^^^^^
+
+warning: struct `ThreatAssessment` is never constructed
+  --> src/shard.rs:35:12
+   |
+35 | pub struct ThreatAssessment {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: struct `ShardDetector` is never constructed
+  --> src/shard.rs:44:12
+   |
+44 | pub struct ShardDetector {
+   |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `record_event`, `assess`, and `current_assessment` are never used
+   --> src/shard.rs:53:12
+    |
+ 52 | impl ShardDetector {
+    | ------------------ associated items in this implementation
+ 53 |     pub fn new() -> Self { Self::default() }
+    |            ^^^
+ 54 |
+ 55 |     pub fn record_event(&mut self, event: NetworkEvent) -> ThreatAssessment {
+    |            ^^^^^^^^^^^^
+...
+ 74 |     fn assess(&mut self) -> ThreatAssessment {
+    |        ^^^^^^
+...
+110 |     pub fn current_assessment(&mut self) -> ThreatAssessment { self.assess() }
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: struct `Shard` is never constructed
+   --> src/shard.rs:114:12
+    |
+114 | pub struct Shard {
+    |            ^^^^^
+
+warning: associated items `new`, `size`, `elect_bridges`, and `can_merge_with` are never used
+   --> src/shard.rs:127:12
+    |
+126 | impl Shard {
+    | ---------- associated items in this implementation
+127 |     pub fn new(id: &str, nodes: Vec<String>, region: &str, generation: u32) -> Self {
+    |            ^^^
+...
+145 |     pub fn size(&self) -> usize { self.nodes.len() }
+    |            ^^^^
+146 |
+147 |     pub fn elect_bridges(&mut self) {
+    |            ^^^^^^^^^^^^^
+...
+152 |     pub fn can_merge_with(&self, other: &Shard) -> bool {
+    |            ^^^^^^^^^^^^^^
+
+warning: struct `ShardManager` is never constructed
+   --> src/shard.rs:157:12
+    |
+157 | pub struct ShardManager {
+    |            ^^^^^^^^^^^^
+
+warning: associated items `new`, `split`, `merge`, `find_mergeable_pairs`, and `stats` are never used
+   --> src/shard.rs:165:12
+    |
+164 | impl ShardManager {
+    | ----------------- associated items in this implementation
+165 |     pub fn new() -> Self {
+    |            ^^^
+...
+169 |     pub fn split(&mut self, nodes: &[String], assessment: &ThreatAssessment) -> Vec<Shard> {
+    |            ^^^^^
+...
+195 |     pub fn merge(&mut self, a_id: &str, b_id: &str) -> Option<Shard> {
+    |            ^^^^^
+...
+215 |     pub fn find_mergeable_pairs(&self) -> Vec<(String, String)> {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+228 |     pub fn stats(&self) -> ShardStats {
+    |            ^^^^^
+
+warning: struct `ShardStats` is never constructed
+   --> src/shard.rs:250:12
+    |
+250 | pub struct ShardStats {
+    |            ^^^^^^^^^^
+
+warning: struct `RendezvousBeacon` is never constructed
+   --> src/shard.rs:280:12
+    |
+280 | pub struct RendezvousBeacon {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: struct `RendezvousProtocol` is never constructed
+   --> src/shard.rs:288:12
+    |
+288 | pub struct RendezvousProtocol {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `publish_beacon`, and `find_matches` are never used
+   --> src/shard.rs:294:12
+    |
+293 | impl RendezvousProtocol {
+    | ----------------------- associated items in this implementation
+294 |     pub fn new() -> Self {
+    |            ^^^
+...
+298 |     pub fn publish_beacon(&mut self, shard: &Shard) {
+    |            ^^^^^^^^^^^^^^
+...
+308 |     pub fn find_matches(&mut self) -> Vec<(String, String)> {
+    |            ^^^^^^^^^^^^
+
+warning: enum `NetworkState` is never used
+   --> src/shard.rs:329:10
+    |
+329 | pub enum NetworkState {
+    |          ^^^^^^^^^^^^
+
+warning: struct `DynamicNetwork` is never constructed
+   --> src/shard.rs:336:12
+    |
+336 | pub struct DynamicNetwork {
+    |            ^^^^^^^^^^^^^^
+
+warning: associated items `new`, `handle_threat`, `attempt_recovery`, and `status` are never used
+   --> src/shard.rs:345:12
+    |
+344 | impl DynamicNetwork {
+    | ------------------- associated items in this implementation
+345 |     pub fn new(nodes: Vec<String>) -> Self {
+    |            ^^^
+...
+355 |     pub fn handle_threat(&mut self, event: NetworkEvent) -> ShardingAction {
+    |            ^^^^^^^^^^^^^
+...
+368 |     pub fn attempt_recovery(&mut self) -> ShardingAction {
+    |            ^^^^^^^^^^^^^^^^
+...
+393 |     pub fn status(&self) -> String {
+    |            ^^^^^^
+
+warning: enum `ShardingAction` is never used
+   --> src/shard.rs:401:10
+    |
+401 | pub enum ShardingAction {
+    |          ^^^^^^^^^^^^^^
+
+warning: constant `MAX_SWARM_MEMORY` is never used
+ --> src/swarm.rs:6:11
+  |
+6 | pub const MAX_SWARM_MEMORY: usize = 10000;
+  |           ^^^^^^^^^^^^^^^^
+
+warning: constant `GOSSIP_FAN_OUT` is never used
+ --> src/swarm.rs:7:11
+  |
+7 | pub const GOSSIP_FAN_OUT: usize = 3;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `EXPERIENCE_TTL` is never used
+ --> src/swarm.rs:8:11
+  |
+8 | pub const EXPERIENCE_TTL: u8 = 7;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `MIN_TRUST_FOR_EXPERIENCE` is never used
+ --> src/swarm.rs:9:11
+  |
+9 | pub const MIN_TRUST_FOR_EXPERIENCE: f64 = 0.5;
+  |           ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `CONFIRMATION_THRESHOLD` is never used
+  --> src/swarm.rs:10:11
+   |
+10 | pub const CONFIRMATION_THRESHOLD: usize = 3;
+   |           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `ExperienceType` is never used
+  --> src/swarm.rs:13:10
+   |
+13 | pub enum ExperienceType {
+   |          ^^^^^^^^^^^^^^
+
+warning: struct `Experience` is never constructed
+  --> src/swarm.rs:23:12
+   |
+23 | pub struct Experience {
+   |            ^^^^^^^^^^
+
+warning: associated items `new`, `confirm`, `is_verified`, and `propagate` are never used
+  --> src/swarm.rs:37:12
+   |
+36 | impl Experience {
+   | --------------- associated items in this implementation
+37 |     pub fn new(origin_node: &str, origin_region: &str, experience_type: ExperienceType) -> Self {
+   |            ^^^
+...
+64 |     pub fn confirm(&mut self, confirming_node: &str) {
+   |            ^^^^^^^
+...
+73 |     pub fn is_verified(&self) -> bool { self.confirmations >= CONFIRMATION_THRESHOLD }
+   |            ^^^^^^^^^^^
+74 |
+75 |     pub fn propagate(&mut self) -> bool {
+   |            ^^^^^^^^^
+
+warning: struct `SwarmMemory` is never constructed
+  --> src/swarm.rs:81:12
+   |
+81 | pub struct SwarmMemory {
+   |            ^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> src/swarm.rs:91:12
+    |
+ 90 | impl SwarmMemory {
+    | ---------------- associated items in this implementation
+ 91 |     pub fn new() -> Self { Self::default() }
+    |            ^^^
+ 92 |
+ 93 |     pub fn absorb(&mut self, exp: Experience) -> bool {
+    |            ^^^^^^
+...
+118 |     pub fn get_by_type(&self, type_key: &str) -> Vec<&Experience> {
+    |            ^^^^^^^^^^^
+...
+124 |     pub fn get_by_region(&self, region: &str) -> Vec<&Experience> {
+    |            ^^^^^^^^^^^^^
+...
+130 |     pub fn censorship_bypasses_for(&self, region: &str) -> Vec<&Experience> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+138 |     fn prune(&mut self) {
+    |        ^^^^^
+...
+146 |     pub fn stats(&self) -> SwarmStats {
+    |            ^^^^^
+
+warning: struct `SwarmStats` is never constructed
+   --> src/swarm.rs:161:12
+    |
+161 | pub struct SwarmStats {
+    |            ^^^^^^^^^^
+
+warning: struct `GossipMessage` is never constructed
+   --> src/swarm.rs:194:12
+    |
+194 | pub struct GossipMessage {
+    |            ^^^^^^^^^^^^^
+
+warning: struct `GossipProtocol` is never constructed
+   --> src/swarm.rs:200:12
+    |
+200 | pub struct GossipProtocol {
+    |            ^^^^^^^^^^^^^^
+
+warning: associated items `new`, `receive`, `originate`, and `drain_pending` are never used
+   --> src/swarm.rs:210:12
+    |
+209 | impl GossipProtocol {
+    | ------------------- associated items in this implementation
+210 |     pub fn new(node_id: &str, region: &str) -> Self {
+    |            ^^^
+...
+219 |     pub fn receive(&mut self, mut msg: GossipMessage, memory: &mut SwarmMemory) -> bool {
+    |            ^^^^^^^
+...
+237 |     pub fn originate(&mut self, exp_type: ExperienceType, memory: &mut SwarmMemory) -> GossipMessage {
+    |            ^^^^^^^^^
+...
+249 |     pub fn drain_pending(&mut self) -> Vec<GossipMessage> {
+    |            ^^^^^^^^^^^^^
+
+warning: struct `SwarmLearner` is never constructed
+   --> src/swarm.rs:255:12
+    |
+255 | pub struct SwarmLearner {
+    |            ^^^^^^^^^^^^
+
+warning: associated items `new`, `learn_and_apply`, `apply_experience`, `get_route_bonus`, `is_blacklisted`, and `simulate_network_gossip` are never used
+   --> src/swarm.rs:262:12
+    |
+261 | impl SwarmLearner {
+    | ----------------- associated items in this implementation
+262 |     pub fn new(node_id: &str, region: &str) -> Self {
+    |            ^^^
+...
+270 |     pub fn learn_and_apply(&mut self, msg: GossipMessage) {
+    |            ^^^^^^^^^^^^^^^
+...
+275 |     fn apply_experience(&mut self, exp: &Experience) {
+    |        ^^^^^^^^^^^^^^^^
+...
+288 |     pub fn get_route_bonus(&self, node_id: &str) -> f64 {
+    |            ^^^^^^^^^^^^^^^
+...
+292 |     pub fn is_blacklisted(&self, node_id: &str) -> bool {
+    |            ^^^^^^^^^^^^^^
+...
+296 |     pub fn simulate_network_gossip(&mut self, experiences: Vec<(ExperienceType, &str, &str)>) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `SSAU_DIMENSIONS` is never used
+ --> src/tensor.rs:4:11
+  |
+4 | pub const SSAU_DIMENSIONS: usize = 5;
+  |           ^^^^^^^^^^^^^^^
+
+warning: constant `TRUST_DECAY_ALPHA` is never used
+ --> src/tensor.rs:5:11
+  |
+5 | pub const TRUST_DECAY_ALPHA: f64 = 0.1;
+  |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `TRIANGLE_TOLERANCE` is never used
+ --> src/tensor.rs:6:11
+  |
+6 | pub const TRIANGLE_TOLERANCE: f64 = 0.05;
+  |           ^^^^^^^^^^^^^^^^^^
+
+warning: struct `SsauTensor` is never constructed
+ --> src/tensor.rs:9:12
+  |
+9 | pub struct SsauTensor {
+  |            ^^^^^^^^^^
+
+warning: struct `LatencyDistribution` is never constructed
+  --> src/tensor.rs:22:12
+   |
+22 | pub struct LatencyDistribution {
+   |            ^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `add_sample`, and `recalculate` are never used
+  --> src/tensor.rs:29:12
+   |
+28 | impl LatencyDistribution {
+   | ------------------------ associated items in this implementation
+29 |     pub fn new(mean: f64, std_dev: f64) -> Self {
+   |            ^^^
+...
+33 |     pub fn add_sample(&mut self, sample_ms: f64) {
+   |            ^^^^^^^^^^
+...
+42 |     fn recalculate(&mut self) {
+   |        ^^^^^^^^^^^
+
+warning: associated items `new`, `to_vector`, `update_measurement`, and `is_fresh` are never used
+  --> src/tensor.rs:52:12
+   |
+51 | impl SsauTensor {
+   | --------------- associated items in this implementation
+52 |     pub fn new(from_node: &str, to_node: &str, latency_ms: f64, bandwidth_mbps: f64) -> Self {
+   |            ^^^
+...
+68 |     pub fn to_vector(&self) -> [f64; SSAU_DIMENSIONS] {
+   |            ^^^^^^^^^
+...
+72 |     pub fn update_measurement(&mut self, latency_ms: f64, bandwidth_mbps: f64) {
+   |            ^^^^^^^^^^^^^^^^^^
+...
+82 |     pub fn is_fresh(&self, max_age_ms: i64) -> bool {
+   |            ^^^^^^^^
+
+warning: struct `RouteHealthScore` is never constructed
+  --> src/tensor.rs:90:12
+   |
+90 | pub struct RouteHealthScore {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: function `shannon_entropy` is never used
+  --> src/tensor.rs:98:8
+   |
+98 | pub fn shannon_entropy(tensors: &[&SsauTensor]) -> RouteHealthScore {
+   |        ^^^^^^^^^^^^^^^
+
+warning: struct `TriangleCheckResult` is never constructed
+   --> src/tensor.rs:131:12
+    |
+131 | pub struct TriangleCheckResult {
+    |            ^^^^^^^^^^^^^^^^^^^
+
+warning: function `triangle_check` is never used
+   --> src/tensor.rs:138:8
+    |
+138 | pub fn triangle_check(l_ab: f64, l_ac: f64, l_bc: f64, current_trust_weight: f64) -> TriangleCheckResult {
+    |        ^^^^^^^^^^^^^^
+
+warning: struct `TrustRegistry` is never constructed
+   --> src/tensor.rs:160:12
+    |
+160 | pub struct TrustRegistry {
+    |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `get_trust`, `record_check`, `penalize_unreachable`, `get_quarantined_nodes`, and `stats` are never used
+   --> src/tensor.rs:166:12
+    |
+165 | impl TrustRegistry {
+    | ------------------ associated items in this implementation
+166 |     pub fn new() -> Self { Self::default() }
+    |            ^^^
+167 |
+168 |     pub fn get_trust(&self, node_id: &str) -> f64 {
+    |            ^^^^^^^^^
+...
+172 |     pub fn record_check(&mut self, node_id: &str, result: &TriangleCheckResult) {
+    |            ^^^^^^^^^^^^
+...
+177 |     pub fn penalize_unreachable(&mut self, node_id: &str) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+183 |     pub fn get_quarantined_nodes(&self, threshold: f64) -> Vec<String> {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+187 |     pub fn stats(&self) -> String {
+    |            ^^^^^
+
+warning: constant `KEY_SIZE` is never used
+  --> src/zkp.rs:29:11
+   |
+29 | pub const KEY_SIZE: usize = 32;
+   |           ^^^^^^^^
+
+warning: constant `NONCE_SIZE` is never used
+  --> src/zkp.rs:32:11
+   |
+32 | pub const NONCE_SIZE: usize = 16;
+   |           ^^^^^^^^^^
+
+warning: constant `MAX_ONION_LAYERS` is never used
+  --> src/zkp.rs:35:11
+   |
+35 | pub const MAX_ONION_LAYERS: usize = 8;
+   |           ^^^^^^^^^^^^^^^^
+
+warning: function `xorshift64` is never used
+  --> src/zkp.rs:41:4
+   |
+41 | fn xorshift64(state: &mut u64) -> u64 {
+   |    ^^^^^^^^^^
+
+warning: function `generate_bytes` is never used
+  --> src/zkp.rs:49:4
+   |
+49 | fn generate_bytes(seed: u64, len: usize) -> Vec<u8> {
+   |    ^^^^^^^^^^^^^^
+
+warning: function `fnv_hash` is never used
+  --> src/zkp.rs:63:8
+   |
+63 | pub fn fnv_hash(data: &[u8]) -> u64 {
+   |        ^^^^^^^^
+
+warning: function `to_hex` is never used
+  --> src/zkp.rs:73:4
+   |
+73 | fn to_hex(bytes: &[u8]) -> String {
+   |    ^^^^^^
+
+warning: struct `SessionKey` is never constructed
+  --> src/zkp.rs:83:12
+   |
+83 | pub struct SessionKey {
+   |            ^^^^^^^^^^
+
+warning: associated items `generate`, `from_shared_secret`, `encrypt`, and `decrypt` are never used
+   --> src/zkp.rs:91:12
+    |
+ 89 | impl SessionKey {
+    | --------------- associated items in this implementation
+ 90 |     /// Генерировать новый случайный ключ
+ 91 |     pub fn generate() -> Self {
+    |            ^^^^^^^^
+...
+107 |     pub fn from_shared_secret(our_secret: u64, their_public: u64) -> Self {
+    |            ^^^^^^^^^^^^^^^^^^
+...
+117 |     pub fn encrypt(&self, plaintext: &[u8]) -> Vec<u8> {
+    |            ^^^^^^^
+...
+125 |     pub fn decrypt(&self, ciphertext: &[u8]) -> Vec<u8> {
+    |            ^^^^^^^
+
+warning: struct `ZkpCommitment` is never constructed
+   --> src/zkp.rs:141:12
+    |
+141 | pub struct ZkpCommitment {
+    |            ^^^^^^^^^^^^^
+
+warning: associated items `commit` and `verify` are never used
+   --> src/zkp.rs:152:12
+    |
+150 | impl ZkpCommitment {
+    | ------------------ associated items in this implementation
+151 |     /// Создать commitment для значения
+152 |     pub fn commit(value: &[u8]) -> Self {
+    |            ^^^^^^
+...
+170 |     pub fn verify(&self, value: &[u8]) -> bool {
+    |            ^^^^^^
+
+warning: struct `OnionLayer` is never constructed
+   --> src/zkp.rs:191:12
+    |
+191 | pub struct OnionLayer {
+    |            ^^^^^^^^^^
+
+warning: struct `OnionPacket` is never constructed
+   --> src/zkp.rs:208:12
+    |
+208 | pub struct OnionPacket {
+    |            ^^^^^^^^^^^
+
+warning: struct `OnionBuilder` is never constructed
+   --> src/zkp.rs:230:12
+    |
+230 | pub struct OnionBuilder {
+    |            ^^^^^^^^^^^^
+
+warning: associated items `new`, `with_route`, and `build` are never used
+   --> src/zkp.rs:236:12
+    |
+235 | impl OnionBuilder {
+    | ----------------- associated items in this implementation
+236 |     pub fn new() -> Self {
+    |            ^^^
+...
+241 |     pub fn with_route(mut self, route: Vec<String>) -> Self {
+    |            ^^^^^^^^^^
+...
+248 |     pub fn build(self, payload: &[u8]) -> Result<(OnionPacket, Vec<SessionKey>), String> {
+    |            ^^^^^
+
+warning: struct `PeeledLayer` is never constructed
+   --> src/zkp.rs:331:12
+    |
+331 | pub struct PeeledLayer {
+    |            ^^^^^^^^^^^
+
+warning: function `peel_onion_layer` is never used
+   --> src/zkp.rs:344:8
+    |
+344 | pub fn peel_onion_layer(layer: &OnionLayer, key: &SessionKey) -> PeeledLayer {
+    |        ^^^^^^^^^^^^^^^^
+
+warning: struct `NullifierSet` is never constructed
+   --> src/zkp.rs:361:12
+    |
+361 | pub struct NullifierSet {
+    |            ^^^^^^^^^^^^
+
+warning: associated items `new`, `check_and_add`, and `size` are never used
+   --> src/zkp.rs:368:12
+    |
+367 | impl NullifierSet {
+    | ----------------- associated items in this implementation
+368 |     pub fn new() -> Self { Self::default() }
+    |            ^^^
+...
+371 |     pub fn check_and_add(&mut self, nullifier: &str) -> bool {
+    |            ^^^^^^^^^^^^^
+...
+381 |     pub fn size(&self) -> usize { self.seen.len() }
+    |            ^^^^
+
+warning: struct `BlindedSsau` is never constructed
+   --> src/zkp.rs:392:12
+    |
+392 | pub struct BlindedSsau {
+    |            ^^^^^^^^^^^
+
+warning: associated items `from_tensor` and `decrypt_reliability` are never used
+   --> src/zkp.rs:406:12
+    |
+404 | impl BlindedSsau {
+    | ---------------- associated items in this implementation
+405 |     /// Создать ослеплённый SSAU из реального тензора
+406 |     pub fn from_tensor(
+    |            ^^^^^^^^^^^
+...
+436 |     pub fn decrypt_reliability(&self, session_key: &SessionKey) -> f64 {
+    |            ^^^^^^^^^^^^^^^^^^^
+
+warning: methods `record_failure` and `balance` are never used
+   --> src/credits.rs:197:12
+    |
+152 | impl CreditLedger {
+    | ----------------- methods in this implementation
+...
+197 |     pub fn record_failure(&mut self, node_id: &str) {
+    |            ^^^^^^^^^^^^^^
+...
+202 |     pub fn balance(&self, node_id: &str) -> f64 {
+    |            ^^^^^^^
+
+warning: constant `RECYCLE_BASE_BONUS` is never used
+   --> src/credits.rs:267:11
+    |
+267 | pub const RECYCLE_BASE_BONUS: f64   = 0.30; // +30% за старое железо
+    |           ^^^^^^^^^^^^^^^^^^
+
+warning: method `description` is never used
+   --> src/credits.rs:304:12
+    |
+284 | impl HardwareAge {
+    | ---------------- method in this implementation
+...
+304 |     pub fn description(&self) -> &str {
+    |            ^^^^^^^^^^^
+
+warning: fields `node_id`, `hw_age_years`, and `is_recycled_device` are never read
+   --> src/credits.rs:319:9
+    |
+318 | pub struct EcoProfile {
+    |            ---------- fields in this struct
+319 |     pub node_id: String,
+    |         ^^^^^^^
+320 |     pub hw_age_years: u32,
+    |         ^^^^^^^^^^^^
+...
+325 |     pub is_recycled_device: bool, // устройство из вторсырья
+    |         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `EcoProfile` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `recycled_credits` and `eco_bonus` are never read
+   --> src/credits.rs:366:9
+    |
+363 | pub struct EcoReward {
+    |            --------- fields in this struct
+...
+366 |     pub recycled_credits: f64,
+    |         ^^^^^^^^^^^^^^^^
+367 |     pub eco_bonus: f64,
+    |         ^^^^^^^^^
+    |
+    = note: `EcoReward` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: constant `MIN_BID_CREDITS` is never used
+  --> src/market.rs:20:11
+   |
+20 | pub const MIN_BID_CREDITS: f64    = 0.1;
+   |           ^^^^^^^^^^^^^^^
+
+warning: constant `SLASHING_RATE` is never used
+  --> src/market.rs:22:11
+   |
+22 | pub const SLASHING_RATE: f64      = 0.20;  // 20% штраф за провал
+   |           ^^^^^^^^^^^^^
+
+warning: constant `PREMIUM_THRESHOLD` is never used
+  --> src/market.rs:23:11
+   |
+23 | pub const PREMIUM_THRESHOLD: f64  = 2.0;   // выше — «премиум» трафик
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: methods `base_price` and `name` are never used
+  --> src/market.rs:39:12
+   |
+38 | impl TrafficTier {
+   | ---------------- methods in this implementation
+39 |     pub fn base_price(&self) -> f64 {
+   |            ^^^^^^^^^^
+...
+47 |     pub fn name(&self) -> &str {
+   |            ^^^^
+
+warning: field `node_balances` is never read
+   --> src/market.rs:175:9
+    |
+170 | pub struct BandwidthMarket {
+    |            --------------- field in this struct
+...
+175 |     pub node_balances: HashMap<String, f64>,
+    |         ^^^^^^^^^^^^^
+
+warning: methods `settle` and `price_discovery` are never used
+   --> src/market.rs:265:12
+    |
+181 | impl BandwidthMarket {
+    | -------------------- methods in this implementation
+...
+265 |     pub fn settle(&mut self, bid_id: u64, node_id: &str,
+    |            ^^^^^^
+...
+287 |     pub fn price_discovery(&self, region: &str) -> PriceStats {
+    |            ^^^^^^^^^^^^^^^
+
+warning: struct `PriceStats` is never constructed
+   --> src/market.rs:332:12
+    |
+332 | pub struct PriceStats {
+    |            ^^^^^^^^^^
+
+warning: constant `REP_FAILURE_DECAY` is never used
+  --> src/reputation.rs:23:11
+   |
+23 | pub const REP_FAILURE_DECAY: f64    = 0.02;  // -2% за каждый провал
+   |           ^^^^^^^^^^^^^^^^^
+
+warning: method `delivery_rate` is never used
+   --> src/reputation.rs:142:12
+    |
+123 | impl NodeReputation {
+    | ------------------- method in this implementation
+...
+142 |     pub fn delivery_rate(&self) -> f64 {
+    |            ^^^^^^^^^^^^^
+
+warning: methods `record_failure`, `record_ethics_violation`, `record_dao_participation`, and `dao_weights` are never used
+   --> src/reputation.rs:226:12
+    |
+171 | impl ReputationRegistry {
+    | ----------------------- methods in this implementation
+...
+226 |     pub fn record_failure(&mut self, node_id: &str, region: &str) -> f64 {
+    |            ^^^^^^^^^^^^^^
+...
+265 |     pub fn record_ethics_violation(&mut self, node_id: &str,
+    |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+317 |     pub fn record_dao_participation(&mut self, node_id: &str,
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+360 |     pub fn dao_weights(&self) -> Vec<(String, f64)> {
+    |            ^^^^^^^^^^^
+
+warning: method `trust_rank_of` is never used
+   --> src/reputation.rs:567:12
+    |
+483 | impl TrustGraph {
+    | --------------- method in this implementation
+...
+567 |     pub fn trust_rank_of(&self, node: &str) -> f64 {
+    |            ^^^^^^^^^^^^^
+
+warning: method `burn_rate_30d` is never used
+  --> src/mint.rs:97:12
+   |
+86 | impl BurnLedger {
+   | --------------- method in this implementation
+...
+97 |     pub fn burn_rate_30d(&self) -> f64 {
+   |            ^^^^^^^^^^^^^
+
+warning: constant `MAX_FRAME_SIZE` is never used
+  --> src/transport.rs:20:11
+   |
+20 | pub const MAX_FRAME_SIZE: usize = 65535;
+   |           ^^^^^^^^^^^^^^
+
+warning: methods `verify`, `size_bytes`, and `latency_us` are never used
+   --> src/transport.rs:131:12
+    |
+ 93 | impl TransportFrame {
+    | ------------------- methods in this implementation
+...
+131 |     pub fn verify(&self) -> bool {
+    |            ^^^^^^
+...
+138 |     pub fn size_bytes(&self) -> usize {
+    |            ^^^^^^^^^^
+...
+142 |     pub fn latency_us(&self, clock: &MicroClock) -> u64 {
+    |            ^^^^^^^^^^
+
+warning: struct `SyncBarrier` is never constructed
+   --> src/transport.rs:151:12
+    |
+151 | pub struct SyncBarrier {
+    |            ^^^^^^^^^^^
+
+warning: struct `StrikeResult` is never constructed
+   --> src/transport.rs:161:12
+    |
+161 | pub struct StrikeResult {
+    |            ^^^^^^^^^^^^
+
+warning: associated items `new`, `arrive`, and `fire` are never used
+   --> src/transport.rs:171:12
+    |
+170 | impl SyncBarrier {
+    | ---------------- associated items in this implementation
+171 |     pub fn new(group_id: u64, expected: usize, window_us: u64) -> Self {
+    |            ^^^
+...
+180 |     pub fn arrive(&mut self, node_id: &str) -> bool {
+    |            ^^^^^^
+...
+186 |     pub fn fire(&self, frames: &[TransportFrame]) -> StrikeResult {
+    |            ^^^^
+
+warning: methods `send_strike` and `flush` are never used
+   --> src/transport.rs:307:12
+    |
+232 | impl TransportChannel {
+    | --------------------- methods in this implementation
+...
+307 |     pub fn send_strike(&mut self, payload: &[u8], mask_type: &str,
+    |            ^^^^^^^^^^^
+...
+313 |     pub fn flush(&mut self) -> Vec<TransportFrame> {
+    |            ^^^^^
+
+warning: struct `TransportScheduler` is never constructed
+   --> src/transport.rs:387:12
+    |
+387 | pub struct TransportScheduler {
+    |            ^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `add_channel`, `plan_strike`, `execute_barrier`, `flush_all`, and `global_stats` are never used
+   --> src/transport.rs:396:12
+    |
+395 | impl TransportScheduler {
+    | ----------------------- associated items in this implementation
+396 |     pub fn new() -> Self {
+    |            ^^^
+...
+406 |     pub fn add_channel(&mut self, src: &str, dst: &str) {
+    |            ^^^^^^^^^^^
+...
+412 |     pub fn plan_strike(&mut self, group_id: u64, channels: &[&str],
+    |            ^^^^^^^^^^^
+...
+427 |     pub fn execute_barrier(&mut self, group_id: u64) -> Option<StrikeResult> {
+    |            ^^^^^^^^^^^^^^^
+...
+447 |     pub fn flush_all(&mut self) -> FlushResult {
+    |            ^^^^^^^^^
+...
+461 |     pub fn global_stats(&self) -> GlobalTransportStats {
+    |            ^^^^^^^^^^^^
+
+warning: struct `FlushResult` is never constructed
+   --> src/transport.rs:489:12
+    |
+489 | pub struct FlushResult {
+    |            ^^^^^^^^^^^
+
+warning: struct `GlobalTransportStats` is never constructed
+   --> src/transport.rs:497:12
+    |
+497 | pub struct GlobalTransportStats {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `src` and `dst` are never read
+   --> src/transport.rs:590:9
+    |
+589 | pub struct HierarchicalRoute {
+    |            ----------------- fields in this struct
+590 |     pub src: String,
+    |         ^^^
+591 |     pub dst: String,
+    |         ^^^
+    |
+    = note: `HierarchicalRoute` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: fields `name` and `signature_db` are never read
+  --> src/veil_breaker.rs:15:9
+   |
+14 | pub struct SuperCensor {
+   |            ----------- fields in this struct
+15 |     pub name: String,
+   |         ^^^^
+...
+19 |     pub signature_db: Vec<String>,
+   |         ^^^^^^^^^^^^
+   |
+   = note: `SuperCensor` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `id`, `src`, `payload`, and `strike_group` are never read
+  --> src/veil_breaker.rs:92:9
+   |
+91 | pub struct SimPacket {
+   |            --------- fields in this struct
+92 |     pub id: u64,
+   |         ^^
+93 |     pub src: String,
+   |         ^^^
+94 |     pub payload: Vec<u8>,
+   |         ^^^^^^^
+...
+97 |     pub strike_group: Option<u64>,
+   |         ^^^^^^^^^^^^
+   |
+   = note: `SimPacket` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `region` is never read
+   --> src/veil_breaker.rs:102:9
+    |
+100 | pub struct NetworkNode {
+    |            ----------- field in this struct
+101 |     pub id: String,
+102 |     pub region: String,
+    |         ^^^^^^
+
+warning: method `next_rng` is never used
+   --> src/veil_breaker.rs:194:8
+    |
+177 | impl VeilBreakerTest {
+    | -------------------- method in this implementation
+...
+194 |     fn next_rng(&mut self) -> f64 {
+    |        ^^^^^^^^
+
+warning: field `aad_len` is never read
+   --> src/chacha.rs:289:9
+    |
+285 | pub struct AeadCiphertext {
+    |            -------------- field in this struct
+...
+289 |     pub aad_len: usize,
+    |         ^^^^^^^
+    |
+    = note: `AeadCiphertext` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `to_bytes` is never used
+   --> src/chacha.rs:293:12
+    |
+292 | impl AeadCiphertext {
+    | ------------------- method in this implementation
+293 |     pub fn to_bytes(&self) -> Vec<u8> {
+    |            ^^^^^^^^
+
+warning: constant `REFRESH_MS` is never used
+  --> src/dashboard.rs:19:11
+   |
+19 | pub const REFRESH_MS: u64    = 500;
+   |           ^^^^^^^^^^
+
+warning: associated constant `BG_DARK` is never used
+  --> src/dashboard.rs:37:15
+   |
+26 | impl Color {
+   | ---------- associated constant in this implementation
+...
+37 |     pub const BG_DARK: &'static str = "\x1b[40m";
+   |               ^^^^^^^
+
+warning: function `header` is never used
+  --> src/dashboard.rs:61:8
+   |
+61 | pub fn header(title: &str) -> String {
+   |        ^^^^^^
+
+warning: fields `pulse_balance` and `uptime_days` are never read
+  --> src/dashboard.rs:93:9
+   |
+86 | pub struct NodeSnapshot {
+   |            ------------ fields in this struct
+...
+93 |     pub pulse_balance: f64,
+   |         ^^^^^^^^^^^^^
+94 |     pub cpu_load: f64,
+95 |     pub uptime_days: u32,
+   |         ^^^^^^^^^^^
+   |
+   = note: `NodeSnapshot` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `id` is never read
+   --> src/simulator.rs:106:9
+    |
+105 | pub struct WarNode {
+    |            ------- field in this struct
+106 |     pub id: usize,
+    |         ^^
+    |
+    = note: `WarNode` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: field `satellite_active` is never read
+   --> src/simulator.rs:195:9
+    |
+189 | pub struct TickStats {
+    |            --------- field in this struct
+...
+195 |     pub satellite_active: usize,
+    |         ^^^^^^^^^^^^^^^^
+    |
+    = note: `TickStats` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: constant `BLOCKLEN` is never used
+  --> src/noise.rs:26:11
+   |
+26 | pub const BLOCKLEN: usize = 64;
+   |           ^^^^^^^^
+
+warning: function `hkdf3` is never used
+  --> src/noise.rs:72:4
+   |
+72 | fn hkdf3(chaining_key: &[u8], input: &[u8])
+   |    ^^^^^
+
+warning: method `mix_key_and_hash` is never used
+   --> src/noise.rs:251:12
+    |
+221 | impl SymmetricState {
+    | ------------------- method in this implementation
+...
+251 |     pub fn mix_key_and_hash(&mut self, input: &[u8]) {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: field `rs_pub` is never read
+   --> src/noise.rs:509:9
+    |
+505 | pub struct NoiseSession {
+    |            ------------ field in this struct
+...
+509 |     pub rs_pub: Option<[u8; DHLEN]>,
+    |         ^^^^^^
+
+warning: constant `HASH_SIZE` is never used
+ --> src/zk_identity.rs:8:7
+  |
+8 | const HASH_SIZE: usize = 32;
+  |       ^^^^^^^^^
+
+warning: type alias `Hash` is never used
+ --> src/zk_identity.rs:9:6
+  |
+9 | type Hash = [u8; HASH_SIZE];
+  |      ^^^^
+
+warning: struct `MerkleTree` is never constructed
+  --> src/zk_identity.rs:12:12
+   |
+12 | pub struct MerkleTree {
+   |            ^^^^^^^^^^
+
+warning: associated items `from_node_keys`, `hash_leaf`, `hash_pair`, `generate_proof`, `verify_proof`, and `size` are never used
+  --> src/zk_identity.rs:19:12
+   |
+18 | impl MerkleTree {
+   | --------------- associated items in this implementation
+19 |     pub fn from_node_keys(node_keys: &[&[u8]]) -> Self {
+   |            ^^^^^^^^^^^^^^
+...
+43 |     fn hash_leaf(data: &[u8]) -> Hash {
+   |        ^^^^^^^^^
+...
+49 |     fn hash_pair(left: &Hash, right: &Hash) -> Hash {
+   |        ^^^^^^^^^
+...
+56 |     pub fn generate_proof(&self, leaf_index: usize) -> Option<MerkleProof> {
+   |            ^^^^^^^^^^^^^^
+...
+69 |     pub fn verify_proof(&self, proof: &MerkleProof) -> bool {
+   |            ^^^^^^^^^^^^
+...
+83 |     pub fn size(&self) -> usize { self.leaves.len() }
+   |            ^^^^
+
+warning: struct `MerkleProof` is never constructed
+  --> src/zk_identity.rs:87:12
+   |
+87 | pub struct MerkleProof {
+   |            ^^^^^^^^^^^
+
+warning: struct `ZkIdentityProof` is never constructed
+  --> src/zk_identity.rs:94:12
+   |
+94 | pub struct ZkIdentityProof {
+   |            ^^^^^^^^^^^^^^^
+
+warning: associated items `create`, `verify`, `sign_challenge`, and `verify_signature` are never used
+   --> src/zk_identity.rs:102:12
+    |
+101 | impl ZkIdentityProof {
+    | -------------------- associated items in this implementation
+102 |     pub fn create(tree: &MerkleTree, node_pubkey: &[u8], node_privkey: &[u8], challenge: &[u8]) -> Option<Self> {
+    |            ^^^^^^
+...
+110 |     pub fn verify(&self, tree: &MerkleTree, challenge: &[u8]) -> bool {
+    |            ^^^^^^
+...
+116 |     fn sign_challenge(privkey: &[u8], challenge: &[u8]) -> Vec<u8> {
+    |        ^^^^^^^^^^^^^^
+...
+124 |     fn verify_signature(_leaf: &Hash, _challenge: &[u8], signature: &[u8]) -> bool {
+    |        ^^^^^^^^^^^^^^^^
+
+warning: struct `FederationMembership` is never constructed
+   --> src/zk_identity.rs:133:12
+    |
+133 | pub struct FederationMembership {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `create_proof`, `verify_proof`, and `size` are never used
+   --> src/zk_identity.rs:141:12
+    |
+140 | impl FederationMembership {
+    | ------------------------- associated items in this implementation
+141 |     pub fn new(nodes: Vec<(String, Vec<u8>)>) -> Self {
+    |            ^^^
+...
+148 |     pub fn create_proof(&self, node_id: &str, node_pubkey: &[u8], node_privkey: &[u8], challenge: &[u8]) -> Option<ZkIdentityProof> {
+    |            ^^^^^^^^^^^^
+...
+153 |     pub fn verify_proof(&mut self, proof: &ZkIdentityProof, challenge: &[u8]) -> bool {
+    |            ^^^^^^^^^^^^
+...
+159 |     pub fn size(&self) -> usize { self.node_ids.len() }
+    |            ^^^^
+
+warning: constant `LEARNING_RATE` is never used
+ --> src/adaptive_censor.rs:8:7
+  |
+8 | const LEARNING_RATE: f64 = 0.15;
+  |       ^^^^^^^^^^^^^
+
+warning: constant `MEMORY_DECAY` is never used
+ --> src/adaptive_censor.rs:9:7
+  |
+9 | const MEMORY_DECAY: f64 = 0.95;
+  |       ^^^^^^^^^^^^
+
+warning: constant `PATTERN_THRESHOLD` is never used
+  --> src/adaptive_censor.rs:10:7
+   |
+10 | const PATTERN_THRESHOLD: f64 = 0.70;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: constant `COORDINATION_DELAY_TICKS` is never used
+  --> src/adaptive_censor.rs:11:7
+   |
+11 | const COORDINATION_DELAY_TICKS: u64 = 3;
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `BypassTactic` is never used
+  --> src/adaptive_censor.rs:14:10
+   |
+14 | pub enum BypassTactic {
+   |          ^^^^^^^^^^^^
+
+warning: enum `BlockStrategy` is never used
+  --> src/adaptive_censor.rs:19:10
+   |
+19 | pub enum BlockStrategy {
+   |          ^^^^^^^^^^^^^
+
+warning: struct `PatternDetector` is never constructed
+  --> src/adaptive_censor.rs:30:12
+   |
+30 | pub struct PatternDetector {
+   |            ^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `observe`, `dominant_tactic`, `most_effective_tactic`, and `decay` are never used
+  --> src/adaptive_censor.rs:37:12
+   |
+36 | impl PatternDetector {
+   | -------------------- associated items in this implementation
+37 |     pub fn new() -> Self {
+   |            ^^^
+...
+45 |     pub fn observe(&mut self, tactic: BypassTactic, success_rate: f64) {
+   |            ^^^^^^^
+...
+53 |     pub fn dominant_tactic(&self) -> Option<BypassTactic> {
+   |            ^^^^^^^^^^^^^^^
+...
+57 |     pub fn most_effective_tactic(&self) -> Option<(BypassTactic, f64)> {
+   |            ^^^^^^^^^^^^^^^^^^^^^
+...
+61 |     pub fn decay(&mut self) {
+   |            ^^^^^
+
+warning: struct `AdaptiveStrategy` is never constructed
+  --> src/adaptive_censor.rs:67:12
+   |
+67 | pub struct AdaptiveStrategy {
+   |            ^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `adapt`, `counter_strategy`, and `update_effectiveness` are never used
+   --> src/adaptive_censor.rs:75:12
+    |
+ 74 | impl AdaptiveStrategy {
+    | --------------------- associated items in this implementation
+ 75 |     pub fn new(initial: BlockStrategy) -> Self {
+    |            ^^^
+...
+ 79 |     pub fn adapt(&mut self, detector: &PatternDetector) {
+    |            ^^^^^
+...
+ 90 |     pub fn counter_strategy(tactic: &BypassTactic) -> BlockStrategy {
+    |            ^^^^^^^^^^^^^^^^
+...
+105 |     pub fn update_effectiveness(&mut self, bypass_rate: f64) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `RegionCensor` is never constructed
+   --> src/adaptive_censor.rs:112:12
+    |
+112 | pub struct RegionCensor {
+    |            ^^^^^^^^^^^^
+
+warning: associated items `new` and `tick` are never used
+   --> src/adaptive_censor.rs:121:12
+    |
+120 | impl RegionCensor {
+    | ----------------- associated items in this implementation
+121 |     pub fn new(region: &str) -> Self {
+    |            ^^^
+...
+131 |     pub fn tick(&mut self, bypass_rate: f64, observed_tactic: BypassTactic) {
+    |            ^^^^
+
+warning: struct `MultiRegionCoordinator` is never constructed
+   --> src/adaptive_censor.rs:141:12
+    |
+141 | pub struct MultiRegionCoordinator {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `coordinate`, `tick_region`, and `average_effectiveness` are never used
+   --> src/adaptive_censor.rs:147:12
+    |
+146 | impl MultiRegionCoordinator {
+    | --------------------------- associated items in this implementation
+147 |     pub fn new(regions: Vec<&str>) -> Self {
+    |            ^^^
+...
+153 |     pub fn coordinate(&mut self) {
+    |            ^^^^^^^^^^
+...
+174 |     pub fn tick_region(&mut self, region: &str, bypass_rate: f64, tactic: BypassTactic) {
+    |            ^^^^^^^^^^^
+...
+178 |     pub fn average_effectiveness(&self) -> f64 {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `WAR2_NODES` is never used
+ --> src/war2.rs:4:11
+  |
+4 | pub const WAR2_NODES: usize = 100;
+  |           ^^^^^^^^^^
+
+warning: constant `LEARNING_WINDOW` is never used
+ --> src/war2.rs:5:11
+  |
+5 | pub const LEARNING_WINDOW: usize = 5;
+  |           ^^^^^^^^^^^^^^^
+
+warning: struct `AdaptiveSuperCensor` is never constructed
+ --> src/war2.rs:8:12
+  |
+8 | pub struct AdaptiveSuperCensor {
+  |            ^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `check_packet`, `receive_aiki_reflection`, `block_rate`, `current_strategy_name`, and `status` are never used
+  --> src/war2.rs:23:12
+   |
+22 | impl AdaptiveSuperCensor {
+   | ------------------------ associated items in this implementation
+23 |     pub fn new(name: &str) -> Self {
+   |            ^^^
+...
+38 |     pub fn check_packet(&mut self, packet: &War2Packet) -> bool {
+   |            ^^^^^^^^^^^^
+...
+70 |     pub fn receive_aiki_reflection(&mut self, intensity: f64) {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^
+...
+74 |     pub fn block_rate(&self) -> f64 {
+   |            ^^^^^^^^^^
+...
+78 |     pub fn current_strategy_name(&self) -> String {
+   |            ^^^^^^^^^^^^^^^^^^^^^
+...
+85 |     pub fn status(&self) -> &str {
+   |            ^^^^^^
+
+warning: struct `War2Packet` is never constructed
+  --> src/war2.rs:93:12
+   |
+93 | pub struct War2Packet {
+   |            ^^^^^^^^^^
+
+warning: associated items `new` and `with_mask` are never used
+   --> src/war2.rs:103:12
+    |
+102 | impl War2Packet {
+    | --------------- associated items in this implementation
+103 |     pub fn new(id: u64, node_id: &str, tactic: BypassTactic) -> Self {
+    |            ^^^
+...
+106 |     pub fn with_mask(mut self, mask: &str) -> Self { self.mask = mask.to_string(); self }
+    |            ^^^^^^^^^
+
+warning: struct `War2Node` is never constructed
+   --> src/war2.rs:110:12
+    |
+110 | pub struct War2Node {
+    |            ^^^^^^^^
+
+warning: associated items `new` and `adapt_tactic` are never used
+   --> src/war2.rs:120:12
+    |
+119 | impl War2Node {
+    | ------------- associated items in this implementation
+120 |     pub fn new(id: &str) -> Self {
+    |            ^^^
+...
+124 |     pub fn adapt_tactic(&mut self) {
+    |            ^^^^^^^^^^^^
+
+warning: struct `War2Simulator` is never constructed
+   --> src/war2.rs:130:12
+    |
+130 | pub struct War2Simulator {
+    |            ^^^^^^^^^^^^^
+
+warning: associated items `new` and `run_phase` are never used
+   --> src/war2.rs:137:12
+    |
+136 | impl War2Simulator {
+    | ------------------ associated items in this implementation
+137 |     pub fn new() -> Self {
+    |            ^^^
+...
+141 |     pub fn run_phase(&mut self, name: &str, ticks: usize, packets_per_node: u32) -> War2PhaseResult {
+    |            ^^^^^^^^^
+
+warning: struct `War2PhaseResult` is never constructed
+   --> src/war2.rs:174:12
+    |
+174 | pub struct War2PhaseResult {
+    |            ^^^^^^^^^^^^^^^
+
+warning: function `NodeCapacity_from` should have a snake case name
+   --> src/main.rs:792:4
+    |
+792 | fn NodeCapacity_from(hw: &crate::inventory::HardwareProfile) -> crate::inventory::NodeCapacity {
+    |    ^^^^^^^^^^^^^^^^^ help: convert the identifier to snake case: `node_capacity_from`
+    |
+    = note: `#[warn(non_snake_case)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+warning: `federation-core` (bin "federation-node") generated 406 warnings (run `cargo fix --bin "federation-node" -p federation-core` to apply 35 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.45s

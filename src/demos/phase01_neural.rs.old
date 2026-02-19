@@ -1,0 +1,125 @@
+//! Phase 1: Neural Routing & Federated Learning
+//!
+//! Obsahuje:
+//! - Neural routing demo
+//! - Federated learning demo  
+//! - Mutation engine demo
+//! - Neural tactics demo
+//! - Collective tactics demo
+
+use crate::*;
+
+/// Hlavní entry point pro Phase 1
+pub async fn demo_phase1() {
+    println!("\n╔════════════════════════════════════════════╗");
+    println!("║  PHASE 1: Neural Routing & SSAU Demo     ║");
+    println!("╚════════════════════════════════════════════╝\n");
+    
+    run_neural_demo().await;
+    println!("\n{}\n", "=".repeat(60));
+    
+    run_federated_demo().await;
+    println!("\n{}\n", "=".repeat(60));
+    
+    run_mutation_demo().await;
+    println!("\n{}\n", "=".repeat(60));
+    
+    run_neural_tactics_demo().await;
+    println!("\n{}\n", "=".repeat(60));
+    
+    run_collective_tactics_demo().await;
+    
+    println!("\n✅ Phase 1 Complete!");
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DEMO FUNKCE (přesunuté z main.rs)
+// ═══════════════════════════════════════════════════════════════
+
+pub async fn run_neural_demo() {
+    use crate::neural_node::{NeuralRouter, NeuralInput, NeuralTarget, NeuralState};
+    
+    println!("=== NEURAL ROUTING DEMO ===");
+    let mut router = NeuralRouter::new("nexus-core-01");
+    let input = NeuralInput::from_metrics(25.0, 150.0, 0.88, 0.7);
+    let target = NeuralTarget::success_route(0.9);
+    let output = router.score_route("hub-berlin-01", &input);
+    
+    println!("Input:  latency={:.1}ms bandwidth={:.1}Mbps", input.latency_norm, input.bandwidth_norm);
+    println!("Output: route_score={:.3} tactic={:?}", output.route_score, output.tactic);
+    println!("Target: {:.3}", target.route_quality);
+}
+
+pub async fn run_federated_demo() {
+    use crate::federated::{GlobalDefenseModel, FedAvgAggregator, LocalTrainer};
+    
+    println!("=== FEDERATED LEARNING DEMO ===");
+    let mut model = GlobalDefenseModel::new();
+    let mut agg = FedAvgAggregator::new();
+    
+    let nodes = vec!["nexus", "berlin", "tokyo"];
+    for node_id in nodes {
+        let mut trainer = LocalTrainer::new(node_id, "EU");
+        agg.submit_update(node_id, trainer.weights.clone(), 1.0);
+    }
+    
+    model.weights = agg.aggregate();
+    println!("Global model updated with {} node contributions", agg.num_updates);
+}
+
+pub async fn run_mutation_demo() {
+    use crate::mutation::{MutationEngine, MutationStrategy};
+    
+    println!("=== MUTATION ENGINE DEMO ===");
+    let mut engine = MutationEngine::new("nexus-core-01");
+    engine.set_strategy(MutationStrategy::default_aiki());
+    
+    let payload = b"FEDERATION_PULSE:bypass=0.87,region=CN";
+    let mutated = engine.apply_standoff(payload, 0.15);
+    
+    println!("Original:  {} bytes", payload.len());
+    println!("Mutated:   {} bytes (+{:.1}% overhead)", 
+        mutated.len(), 
+        ((mutated.len() as f64 / payload.len() as f64) - 1.0) * 100.0
+    );
+    println!("Strategy:  {:?}", engine.current_strategy);
+}
+
+pub async fn run_neural_tactics_demo() {
+    use crate::neural_node::{NeuralState, NeuralInput, NeuralTarget, NeuralTactic};
+    
+    println!("=== NEURAL TACTICS DEMO ===");
+    let mut state = NeuralState::new("nexus-core-01");
+    
+    let scenarios = vec![
+        ("Low latency", 15.0, 200.0, 0.95, 0.9),
+        ("High latency", 250.0, 50.0, 0.65, 0.4),
+        ("Under attack", 180.0, 80.0, 0.45, 0.2),
+    ];
+    
+    for (name, lat, bw, rel, trust) in scenarios {
+        let input = NeuralInput::from_metrics(lat, bw, rel, trust);
+        let tactic = state.select_tactic(&input);
+        println!("{:15} → {:?}", name, tactic);
+    }
+}
+
+pub async fn run_collective_tactics_demo() {
+    use crate::neural_node::{NeuralInput, NeuralTarget};
+    use crate::federated::GlobalDefenseModel;
+    
+    println!("=== COLLECTIVE TACTICS DEMO ===");
+    let model = GlobalDefenseModel::new();
+    
+    let regions = vec![
+        ("CN", 0.95, "AikiReflection"),
+        ("RU", 0.75, "Hybrid"),
+        ("IR", 0.85, "CumulativeStrike"),
+    ];
+    
+    for (region, difficulty, expected) in regions {
+        let score = model.score_for("SuperCensor", expected);
+        println!("Region {}: difficulty={:.0}% best_tactic={} score={:.2}", 
+            region, difficulty * 100.0, expected, score);
+    }
+}

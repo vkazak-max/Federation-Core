@@ -1,0 +1,28 @@
+[package]
+name = "federation-core"
+version = "0.1.0-alpha"
+edition = "2021"
+authors = ["vkazak"]
+description = "Federation Core — AI-Driven Cognitive P2P Network Node"
+
+[[bin]]
+name = "federation-node"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+tokio-util = { version = "0.7", features = ["codec"] }
+bytes = "1.0"
+ndarray = "0.15"
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+log = "0.4"
+env_logger = "0.10"
+rand = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["COORDINATION_DELAY_TICKS","LEARNING_RATE","MEMORY_DECAY","PATTERN_THRESHOLD"],"enum":["BlockStrategy","BypassTactic"],"struct":["AdaptiveStrategy","MultiRegionCoordinator","PatternDetector","RegionCensor"]};

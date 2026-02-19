@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["AUCTION_WINDOW_MS","MARKET_FEE_RATE","MIN_BID_CREDITS","PREMIUM_THRESHOLD","SLASHING_RATE"],"enum":["TrafficTier"],"struct":["AuctionResult","BandwidthMarket","BidRequest","MarketStats","NodeOffer","PriceStats","Settlement"]};

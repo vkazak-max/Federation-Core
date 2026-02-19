@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CpuArch","DeviceRole","OsType"],"struct":["FederationInventory","HardwareProfile","NodeCapacity","RegionAssignment","RoleClassifier","TopologyStats"]};

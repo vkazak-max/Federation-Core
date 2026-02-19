@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BLACKOUT_THRESHOLD","FEDERATION_KEY","PULSE_INTERVAL_SECS","PULSE_MAX_BYTES","RADIO_FRAME_OVERHEAD","SAT_BANDWIDTH_BPS","SAT_LATENCY_MS"],"enum":["SatelliteProvider","SurvivalStrategy"],"struct":["BlackoutMode","FederationPulse","LinkStats","RadioFrame","SatelliteLink","TransmitResult"]};

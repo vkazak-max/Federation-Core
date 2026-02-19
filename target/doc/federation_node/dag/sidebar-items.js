@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BASE_POA_REWARD","DISHONESTY_PENALTY","MAX_DAG_DEPTH","QUALITY_BONUS"],"fn":["calculate_poa_reward"],"struct":["DagEdge","DagNode","DagStats","FederationDag","PoaResult","SsauSnapshot"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["LEARNING_WINDOW","WAR2_NODES"],"struct":["AdaptiveSuperCensor","War2Node","War2Packet","War2PhaseResult","War2Simulator"]};

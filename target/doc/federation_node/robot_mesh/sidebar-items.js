@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BASTION_SCAN_RADIUS_M","BT_MAX_PAYLOAD","MESH_HOP_TTL","STEALTH_INTERVAL_SECS","ZIGBEE_MAX_PAYLOAD"],"enum":["DroidType","RadioProtocol"],"struct":["BastionStats","CityMesh","CityStats","DroidNode","HomeBastion","MeshRouteResult","RelayResult","StealthPacket"]};

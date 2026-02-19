@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["AIKI_EXHAUST_RATE","ATTACK_TICK","DPI_BLOCK_RATE","INET_KILL_RATE","MESH_SPREAD_RATE","OPERATOR_ARREST","RECOVERY_THRESHOLD","SATELLITE_JAM","WAR_NODES","WAR_TICKS"],"enum":["NodeClass","WarPhase","WarRegion","WarTactic"],"struct":["CensorState","TickStats","WarNode","WarSimulator"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["CONFIRMATION_THRESHOLD","EXPERIENCE_TTL","GOSSIP_FAN_OUT","MAX_SWARM_MEMORY","MIN_TRUST_FOR_EXPERIENCE"],"enum":["ExperienceType"],"struct":["Experience","GossipMessage","GossipProtocol","SwarmLearner","SwarmMemory","SwarmStats"]};

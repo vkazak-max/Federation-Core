@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["HASH_SIZE"],"struct":["FederationMembership","MerkleProof","MerkleTree","ZkIdentityProof"],"type":["Hash"]};
