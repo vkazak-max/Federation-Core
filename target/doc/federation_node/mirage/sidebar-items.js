@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["MIRAGE_TTL_SECS","SCAN_RATE_THRESHOLD","TIMING_ANOMALY_THRESHOLD","UNIQUE_SOURCES_THRESHOLD"],"enum":["AnomalyType","MimicryStrategy","MirageResponse"],"struct":["AnomalyDetector","AnomalyScore","FakeTensor","MazeNode","MazeSimResult","MazeTrap","MimicryMatrix","MirageGenerator","MirageNode","SourceStats"]};

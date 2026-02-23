@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["KEY_SIZE","MAX_ONION_LAYERS","NONCE_SIZE"],"fn":["fnv_hash","generate_bytes","peel_onion_layer","to_hex","xorshift64"],"struct":["BlindedSsau","NullifierSet","OnionBuilder","OnionLayer","OnionPacket","PeeledLayer","SessionKey","ZkpCommitment"]};

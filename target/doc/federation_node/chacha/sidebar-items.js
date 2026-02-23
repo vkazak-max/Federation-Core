@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BLOCK_SIZE","KEY_SIZE","NONCE_SIZE","TAG_SIZE"],"fn":["quarter_round","u32_from_le"],"struct":["AeadCiphertext","ChaCha20","ChaCha20Poly1305","CipherStats","FederationCipher","Poly1305","X25519"]};

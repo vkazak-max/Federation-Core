@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["COLD_VAULT_LIMIT","DEFAULT_SHARDS","DEFAULT_THRESHOLD","GHOST_MEMORY_KB","HOT_VAULT_LIMIT","ZK_PROOF_SIZE"],"enum":["VaultTier"],"fn":["gf_add","gf_inv","gf_mul"],"struct":["CryptoVault","GhostNetwork","KeyShard","ShamirScheme","ShardingResult","VaultEntry","VaultResult","VaultStats","ZkProof"]};

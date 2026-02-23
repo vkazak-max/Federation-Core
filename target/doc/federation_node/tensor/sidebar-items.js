@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["SSAU_DIMENSIONS","TRIANGLE_TOLERANCE","TRUST_DECAY_ALPHA"],"fn":["shannon_entropy","triangle_check"],"struct":["LatencyDistribution","RouteHealthScore","SsauTensor","TriangleCheckResult","TrustRegistry"]};

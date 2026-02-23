@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["demo_phase8","run_pools_demo"]};

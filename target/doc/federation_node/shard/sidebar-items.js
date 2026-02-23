@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BRIDGE_ELECTION_QUORUM","MAX_SHARD_SIZE","MERGE_THRESHOLD","MIN_SHARD_SIZE","RENDEZVOUS_TTL","SPLIT_THRESHOLD"],"enum":["NetworkEvent","NetworkState","ShardingAction","ThreatLevel"],"struct":["DynamicNetwork","RendezvousBeacon","RendezvousProtocol","Shard","ShardDetector","ShardManager","ShardStats","ThreatAssessment"]};

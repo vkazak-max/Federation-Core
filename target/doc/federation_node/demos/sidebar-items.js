@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["phase01_neural","phase02_crypto","phase03_ethics","phase04_governance","phase05_credits","phase06_reputation","phase07_mint","phase08_pools","phase09_chacha","phase10_dashboard","phase11_war"]};

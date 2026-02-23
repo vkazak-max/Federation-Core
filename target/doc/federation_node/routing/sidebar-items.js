@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["ENTROPY_SWITCH_THRESHOLD","SWITCH_PROBABILITY_DELTA"],"fn":["build_route_candidates","dfs_paths","score_route","softmax"],"struct":["AiRouter","RouteCandidate","RouterStats","RoutingDecision","ScoringContext","UserPriorities"]};

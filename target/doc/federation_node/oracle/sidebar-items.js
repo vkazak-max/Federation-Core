@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["MAX_PRICE_DEVIATION","MAX_RESPONSE_SIZE","MIN_ORACLE_CONFIRMATIONS","ORACLE_TTL_SECS"],"enum":["OracleRequestType"],"struct":["OracleConsensus","OracleRegistry","OracleRequest","OracleResponse","OracleStats","ZkContainer"]};

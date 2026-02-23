@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["CONVERGENCE_THRESHOLD","LOCAL_EPOCHS","MAX_ROUNDS","MIN_PARTICIPANTS"],"struct":["AggregationResult","FedAvgAggregator","FedStats","FederatedNetwork","GlobalDefenseModel","LocalDataPoint","LocalTrainer","ModelWeights","TacticReport","TacticalRoundResult"]};

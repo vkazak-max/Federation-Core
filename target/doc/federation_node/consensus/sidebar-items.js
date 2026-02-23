@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BYZANTINE_DELAY_FRACTION","QUORUM_THRESHOLD","ROUND_TIMEOUT_TICKS"],"enum":["ConsensusPhase","FaultMode","NodeTier","RoundResult"],"struct":["Block","ConsensusEngine","ConsensusLog","ConsensusNode","NetworkBuilder","SimulationResult","Vote"]};

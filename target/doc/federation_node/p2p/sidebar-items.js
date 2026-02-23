@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DEFAULT_FEDERATION_PORT","HANDSHAKE_TIMEOUT_SECS","HEARTBEAT_INTERVAL_SECS","MAX_PACKET_SIZE"],"enum":["ConnectionState"],"struct":["FederationNode","NodeConfig","NodeStatus","PeerConnection"]};

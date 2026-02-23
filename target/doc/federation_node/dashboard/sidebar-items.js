@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BAR_WIDTH","DASH_WIDTH","REFRESH_MS"],"enum":["Trend"],"fn":["bar","header","hline","panel_header"],"struct":["Color","DashboardRenderer","DashboardState","NodeSnapshot","RegionSnapshot"]};

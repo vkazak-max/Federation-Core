@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["EDUCATION_HOUR_RATE","EDUCATION_RATE","HEALTH_RATE","HEALTH_UPGRADE_MIN","INSURANCE_RATE","INSURANCE_STREAK_MULT","LARGE_PAYOUT_THRESHOLD","MAX_INSURANCE_PER_EVENT"],"enum":["ClaimStatus","InsuranceReason","PoolType","SessionStatus"],"struct":["EducationSession","HealthRequest","InsuranceClaim","Pool","SwarmTreasury","TreasuryStats"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["demo_phase1","run_collective_tactics_demo","run_federated_demo","run_mutation_demo","run_neural_demo","run_neural_tactics_demo"]};

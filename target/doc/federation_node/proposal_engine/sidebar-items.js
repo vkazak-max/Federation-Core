@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["AI_CONFIDENCE_THRESHOLD","MAX_ETHICS_DEGRADATION","MIN_BYPASS_IMPROVEMENT","SIM_ROUNDS"],"enum":["AiVerdict","ProposalDomain"],"struct":["AiSimResult","AiSimulator","FullSimReport","HumanProposal","IdeaLab","SimScenario"]};

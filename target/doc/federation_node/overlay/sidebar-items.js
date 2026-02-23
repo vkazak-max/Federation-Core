@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["MAX_SEED_NODES","PEER_EXCHANGE_INTERVAL_SECS","ROUTE_AUDIT_INTERVAL_SECS","SSAU_BROADCAST_INTERVAL_SECS"],"fn":["default_seed_nodes"],"struct":["BootstrapManager","FederationMVP","OverlayStats","SeedNode"]};

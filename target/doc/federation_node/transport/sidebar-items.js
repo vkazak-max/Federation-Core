@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["FRAME_VERSION","MAX_FRAME_SIZE","MAX_JITTER_US","MIN_JITTER_US","SYNC_WINDOW_US"],"enum":["RouteLane"],"struct":["ChannelStats","FlushResult","GlobalTransportStats","HierarchicalRoute","HierarchicalRouter","MicroClock","SendResult","StrikeResult","SyncBarrier","TransportChannel","TransportFrame","TransportScheduler"]};
