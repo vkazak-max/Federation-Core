@@ -82,6 +82,19 @@ impl PeerConnection {
     pub fn uptime_secs(&self) -> u64 {
         self.connected_at.elapsed().as_secs()
     }
+    pub async fn recv_from_stream(stream_arc: Arc<Mutex<TcpStream>>) -> Result<FederationPacket, String> {
+        use tokio::io::AsyncReadExt;
+        let mut stream = stream_arc.lock().await;
+        let mut len_buf = [0u8; 4];
+        stream.read_exact(&mut len_buf).await.map_err(|e| format!("Read len error: {}", e))?;
+        let len = u32::from_be_bytes(len_buf) as usize;
+        if len > MAX_PACKET_SIZE {
+            return Err(format!("Packet too large: {}", len));
+        }
+        let mut buf = vec![0u8; len];
+        stream.read_exact(&mut buf).await.map_err(|e| format!("Read payload error: {}", e))?;
+        deserialize_packet(&buf).map_err(|e| e.to_string())
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -242,13 +255,16 @@ impl FederationNode {
     async fn peer_message_loop(self: Arc<Self>, peer_id: String) {
         log::info!("[{}] 🔄 Message loop started for [{}]", self.config.node_id, peer_id);
         loop {
-            let packet = {
-                let mut conns = self.connections.write().await;
-                match conns.get_mut(&peer_id) {
-                    Some(conn) => conn.recv_packet().await,
+            // Клонируем Arc<Mutex<TcpStream>> без удержания connections lock
+            let stream_arc = {
+                let conns = self.connections.read().await;
+                match conns.get(&peer_id) {
+                    Some(conn) => conn.stream.clone(),
                     None => break,
                 }
             };
+            // Читаем пакет без удержания connections lock
+            let packet = PeerConnection::recv_from_stream(stream_arc).await;
             match packet {
                 Ok(p) => {
                     *self.packets_processed.lock().await += 1;

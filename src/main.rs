@@ -1,3 +1,4 @@
+use axum;
 mod consensus;
 mod proposal_engine;
 mod robot_mesh;
@@ -16,6 +17,7 @@ mod neural_node;
 mod oracle;
 mod overlay;
 mod p2p;
+mod api;
 mod routing;
 mod shard;
 mod swarm;
@@ -83,6 +85,7 @@ async fn main() {
     "phase9"     => { demos::phase09_chacha::demo_phase9().await; }
     "phase10"    => { demos::phase10_dashboard::demo_phase10().await; }
     "phase11"    => { demos::phase11_war::demo_phase11().await; }
+        "node"      => { run_p2p_node().await; }
 
         _            => {
             println!("Federation Core — доступные команды:");
@@ -2591,5 +2594,67 @@ mod war2_full_test {
         println!("Final delivery: {:.1}%", p3.delivery_rate * 100.0);
         
         assert!(p3.delivery_rate > 0.3, "Федерация должна выжить!");
+    }
+}
+
+
+async fn run_p2p_node() {
+    use std::sync::Arc;
+    use p2p::{NodeConfig, FederationNode};
+    let node_id = std::env::var("NODE_ID").unwrap_or_else(|_| "nexus-core-01".to_string());
+    let bootstrap = std::env::var("BOOTSTRAP_PEER").ok();
+    let config = NodeConfig::new(&node_id, 9000);
+    let node: Arc<FederationNode> = FederationNode::new(config);
+    let node_api = node.clone();
+    let node_p2p = node.clone();
+    let node_boot = node.clone();
+    let api_task = tokio::spawn(async move {
+        let app = api::router(node_api);
+        let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+        println!("🔌 HTTP API on 0.0.0.0:8080");
+        axum::serve(listener, app).await.unwrap();
+    });
+    let p2p_task = tokio::spawn(async move {
+        node_p2p.start_listener().await.unwrap();
+    });
+    if let Some(peer_addr) = bootstrap {
+        tokio::spawn(async move {
+            tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+            match node_boot.connect_to_peer(&peer_addr).await {
+                Ok(id) => log::info!("✅ Connected to bootstrap peer: {}", id),
+                Err(e) => log::warn!("⚠️ Bootstrap failed: {}", e),
+            }
+        });
+    }
+    tokio::select! {
+        _ = api_task => {},
+        _ = p2p_task => {},
+    }
+}
+async fn run_p2p_node_old() {
+    use std::sync::Arc;
+    use p2p::{NodeConfig, FederationNode};
+
+    let config = NodeConfig::new("nexus-core-01", 9000);
+    println!("🌐 Starting Federation Node on {}", config.listen_addr);
+    println!("🔌 Starting HTTP API on 0.0.0.0:8080");
+    let node: Arc<FederationNode> = FederationNode::new(config);
+
+    let node_p2p = node.clone();
+    let node_api = node.clone();
+
+    let p2p_task = tokio::spawn(async move {
+        node_p2p.start_listener().await.unwrap();
+    });
+
+    let api_task = tokio::spawn(async move {
+        let app = api::router(node_api);
+        let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();
+        axum::serve(listener, app).await.unwrap();
+    });
+
+    tokio::select! {
+        _ = p2p_task => {},
+        _ = api_task => {},
     }
 }

@@ -66,7 +66,7 @@ impl SeedNode {
 /// Список публичных seed-узлов Федерации (MVP)
 pub fn default_seed_nodes() -> Vec<SeedNode> {
     vec![
-        SeedNode::new("78.47.246.100:7777", "nexus-core-01", "EU-DE"),
+        SeedNode::new("78.47.246.100:9000", "nexus-core-01", "EU-DE"),
     ]
 }
 
